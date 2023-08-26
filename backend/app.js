@@ -1,6 +1,7 @@
 const express = require('express');
 const connectDB = require('./config/db');
 const bodyParser = require('body-parser');
+const cors = require('cors');
 const session = require('express-session');
 const authRoutes = require('./routes/authRoutes');
 const tourroute = require('./routes/adminRoutes');
@@ -8,6 +9,10 @@ const addTeam = require('./routes/userRoutes');
 
 
 const app = express();
+app.use(cors({
+    origin: "http://localhost:5173",
+    credentials: true
+}));
 app.use(session({
     secret: 'dhruvin@2003',
     resave: true,
