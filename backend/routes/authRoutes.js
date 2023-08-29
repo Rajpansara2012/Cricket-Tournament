@@ -6,7 +6,7 @@ const router = express.Router();
 router.post('/signup', async (req, res) => {
     try {
         const { username, type, email, password } = req.body;
-        console.log(username);
+        // console.log(username);
         const hashedPassword = await bcrypt.hash(password, 10);
         const user = new User({ username, email, type, password: hashedPassword });
         await user.save();
@@ -23,6 +23,7 @@ router.post('/login', async (req, res) => {
         const { email, password } = req.body;
         const user = await User.findOne({ email });
         if (user && (await bcrypt.compare(password, user.password))) {
+
             req.session.userId = user._id;
             // console.log(req.session);
             res.json({ message: 'Logged in successfully.' });
