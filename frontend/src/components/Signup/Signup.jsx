@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useState } from "react";
-import "./Signup.css";
+// import "/common.css";
 import { useNavigate, Link } from "react-router-dom";
 function Signup() {
     const [formData, setFormData] = useState({
@@ -48,14 +48,16 @@ function Signup() {
                         <label htmlFor="type" className="block mb-1 font-medium">
                             Account Type
                         </label>
-                        <input
-                            type="text"
+                        <select
+                            id="type"
                             name="type"
                             value={formData.type}
                             onChange={handleChange}
                             className="w-full p-2 border rounded focus:ring focus:ring-blue-300"
-                            placeholder="Account Type"
-                        />
+                        >
+                            <option value="user">User</option>
+                            <option value="admin">Admin</option>
+                        </select>
                     </div>
                     <div className="mb-4">
                         <label htmlFor="username" className="block mb-1 font-medium">

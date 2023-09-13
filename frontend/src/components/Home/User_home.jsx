@@ -1,0 +1,9 @@
+import axios from "axios";
+function User_home() {
+    return (
+        <div>
+            <h1>User</h1>
+        </div>
+    )
+}
+export default User_home

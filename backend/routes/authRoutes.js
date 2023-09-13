@@ -23,10 +23,9 @@ router.post('/login', async (req, res) => {
         const { email, password } = req.body;
         const user = await User.findOne({ email });
         if (user && (await bcrypt.compare(password, user.password))) {
-
-            req.session.userId = user._id;
-            // console.log(req.session);
-            res.json({ message: 'Logged in successfully.' });
+            // console.log(req.session.userId);
+            res.cookie('token', user._id, { expires: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000), httpOnly: true }).json({ message: 'Logged in successfully.', user });
+            // console.log(res.cookies)
         } else {
             res.status(401).json({ error: 'Invalid credentials.' });
         }
@@ -47,20 +46,17 @@ router.post('/profile', async (req, res) => {
     }
 });
 router.post('/logout', (req, res) => {
-    if (req.session.userId) {
-        req.session.destroy((err) => {
+    // console.log("In logout")
+    try {
+        res.status(200).cookie("token", null, {
+            expires: new Date(), httpOnly: true
+        }).json({
+            success: true,
+            message: "Logged Out"
+        })
 
-            if (err) {
-                console.error('Error destroying session:', err);
-                res.status(500).json({ error: 'An error occurred while logging out.' });
-            } else {
-                res.clearCookie('connect.sid');
-                res.json({ message: 'Logged out successfully.' });
-            }
-        });
-    }
-    else {
-        res.json({ message: 'already Logged out successfully.' });
+    } catch (e) {
+        res.status(500).json({ success: false, error: e.message })
     }
 });
 

@@ -1,8 +1,9 @@
 import axios from "axios";
 import { useState } from "react";
-
 import { useNavigate, Link } from "react-router-dom";
+
 function Login() {
+
     const [formData, setFormData] = useState({
         email: "",
         password: ""
@@ -29,7 +30,13 @@ function Login() {
                     withCredentials: true,
                 }
             )
-            navigate("/");
+            const userData = response.data.user;
+            console.log(response)
+            if (response.data.user.type == "admin")
+                navigate("/Admin_home");
+            else
+                navigate("/User_home");
+
         }
         catch (error) {
             console.log(error);
