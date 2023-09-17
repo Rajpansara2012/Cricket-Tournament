@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate} from "react-router-dom";
 import Details from "./Details";
 
 function Admin_home() {
@@ -26,7 +26,7 @@ function Admin_home() {
                 setTournaments(response.data.tournament);
                 console.log(response.data.tournament);
             } catch (error) {
-                navigate("/Signup")
+                navigate("/Login")
                 console.log(error);
             }
         };
