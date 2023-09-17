@@ -32,8 +32,8 @@ const Details = (props) => {
         <div>
 
             {teams && teams.length > 0 ? (
-                teams.map((team) => (
-                    <li key={team.id}>{team.team_name}</li>
+                teams.map((team, index) => (
+                    <li key={index}>{team.team_name}</li>
                 ))
             ) : (
                 <p>No teams available</p>

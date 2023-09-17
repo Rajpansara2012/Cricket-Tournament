@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useState, useEffect } from "react";
-import { useNavigate} from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import Details from "./Details";
 
 function Admin_home() {
@@ -24,7 +24,6 @@ function Admin_home() {
                     }
                 );
                 setTournaments(response.data.tournament);
-                console.log(response.data.tournament);
             } catch (error) {
                 navigate("/Login")
                 console.log(error);
@@ -39,39 +38,29 @@ function Admin_home() {
         else {
             setSelectedTournament(tournament);
             setisshow(true);
+            console.log(isshow);
         }
     };
 
-    const handleLogout = async () => {
-        try {
-            await axios.post("http://localhost:8082/auth/logout",
-                {},
-                {
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    withCredentials: true,
-                }
-            )
-            navigate("/Login")
-        }
-        catch (error) {
-            console.log(error);
-        }
-    }
 
-    const handleTournament = () => {
-        navigate("/Add_Tournament");
-    }
+    // const handleTournament = () => {
+    //     navigate("/Add_Tournament");
+    // }
 
+    // const handleMatch = () => {
+    //     navigate("/Add_Match");
+    // }
     return (
         <div>
-            <button onClick={handleLogout}>
+            {/* <button onClick={handleLogout}>
                 Logout
             </button>
             <button onClick={handleTournament}>
                 Add tournament
             </button>
+            <button onClick={handleMatch}>
+                Add Match
+            </button> */}
             <h1>Tournaments List</h1>
 
             {tournaments.map((tournament) => (

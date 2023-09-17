@@ -22,6 +22,7 @@ router.post('/addtournament', isauthenticated, async (req, res) => {
     }
 });
 router.post('/showallt', isauthenticated, async (req, res) => {
+
     try {
         // const userId = req.session.userId;
         if (req.userId) {
@@ -49,19 +50,18 @@ router.post('/add_match', isauthenticated, async (req, res) => {
         const toss = req.body.toss;
         const toss_status = req.body.toss_status;
         const venue = req.body.venue;
-        const tournament_name = req.body.tournament_name;
-        const tournament = await (Tournament.findOne({ tournament_name: tournament_name }));
-        const tournamentId = tournament._id;
+        const tournament_id = req.body.tournament_id;
+        const tournament = await (Tournament.findById(tournament_id));
         // console.log(tournamentId);
 
-        const userId = req.session.userId;
+        const userId = req.userId;
         const team = [];
-        team.push(await Team.findOne({ team_name: team_name1, tournamentId }));
-        team.push(await Team.findOne({ team_name: team_name2, tournamentId }));
+        team.push(await Team.findOne({ team_name: team_name1, tournamentId: tournament_id }));
+        team.push(await Team.findOne({ team_name: team_name2, tournamentId: tournament_id }));
         // console.log(team[0].tournamentId);
         // console.log(team[1].tournamentId);
 
-        if (team[0].tournamentId != tournamentId || team[1].tournamentId != tournamentId) {
+        if (team[0].tournamentId != tournament_id || team[1].tournamentId != tournament_id) {
             res.status(500).json({ error: "team doestn't exit" });
         }
         else {
@@ -69,21 +69,22 @@ router.post('/add_match', isauthenticated, async (req, res) => {
                 team_name: [team_name1, team_name2],
                 total_over,
                 venue: venue,
-                tournamentId: tournamentId,
+                tournamentId: tournament_id,
                 userId: userId,
                 toss,
                 toss_status
             });
             match.save();
             if (toss == team[0].team_name && toss_status == "batting") {
-                req.session.team1 = team[0];
-                req.session.team2 = team[1];
+                res.cookie('team1', team[0], { expires: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000), httpOnly: true });
+                res.cookie('team2', team[1], { expires: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000), httpOnly: true });
+
             }
             else {
-                req.session.team1 = team[1];
-                req.session.team2 = team[0];
+                res.cookie('team1', team[1], { expires: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000), httpOnly: true });
+                res.cookie('team2', team[0], { expires: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000), httpOnly: true });
             }
-            res.json({ message: 'match added successfully.', match });
+            res.json({ message: 'match added successfully.', match, team1: team[0], team2: team[1] });
 
         }
     }
@@ -97,7 +98,6 @@ router.post('/teams', async (req, res) => {
     try {
 
         const teamsid = req.body.teamsid;
-        // console.log(teamsid)
         let allteams = []
         await Promise.all(teamsid.map(async (teamid) => {
             const team = await Team.findById(teamid);

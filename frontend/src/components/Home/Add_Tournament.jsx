@@ -1,8 +1,17 @@
 import React from 'react'
 import axios from "axios";
-import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import Cookies from 'js-cookie';
 function Add_Tournament() {
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const userfind = Cookies.get('token');
+        if (userfind === undefined) {
+            navigate("/Login")
+        }
+    }, []);
     const [formData, setFormData] = useState({
         tournament_name: "",
         capacity: 0
@@ -49,6 +58,7 @@ function Add_Tournament() {
                             onChange={handleChange}
                             className="w-full p-2 border rounded focus:ring focus:ring-blue-300"
                             placeholder="Tournament Name"
+                            required
                         />
                     </div>
                     <div className="mb-4">
@@ -59,6 +69,9 @@ function Add_Tournament() {
                             onChange={handleChange}
                             className="w-full p-2 border rounded focus:ring focus:ring-blue-300"
                             placeholder="capacity"
+                            min="1"
+                            step="1"
+                            required
                         />
                     </div>
                     <button
@@ -68,6 +81,7 @@ function Add_Tournament() {
                         Add Tournament
                     </button>
                 </form>
+
             </div>
         </div>
     )

@@ -24,7 +24,7 @@ router.post('/login', async (req, res) => {
         const user = await User.findOne({ email });
         if (user && (await bcrypt.compare(password, user.password))) {
             // console.log(req.session.userId);
-            res.cookie('token', user._id, { expires: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000), httpOnly: true }).json({ message: 'Logged in successfully.', user });
+            res.cookie('token', user._id, { expires: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000) }).json({ message: 'Logged in successfully.', user });
             // console.log(res.cookies)
         } else {
             res.status(401).json({ error: 'Invalid credentials.' });

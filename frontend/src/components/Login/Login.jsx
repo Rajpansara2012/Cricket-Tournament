@@ -1,14 +1,23 @@
 import axios from "axios";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-
+import Cookies from 'js-cookie';
 function Login() {
+
+    useEffect(() => {
+        const userfind = Cookies.get('token');
+        if (userfind != undefined) {
+            navigate("/Admin_home")
+        }
+    }, []);
 
     const [formData, setFormData] = useState({
         email: "",
         password: ""
     });
+
     const navigate = useNavigate();
+
     const handleChange = (event) => {
         const { name, value } = event.target;
 
@@ -17,6 +26,7 @@ function Login() {
             [name]: value,
         }));
     };
+
     const handleSubmit = async (event) => {
         event.preventDefault();
         try {
@@ -73,6 +83,12 @@ function Login() {
                     >
                         Login
                     </button>
+                    <p className="mt-4 text-center">
+                        haven't account?{" "}
+                        <Link to="/Signup" className="text-blue-500">
+                            Singup
+                        </Link>
+                    </p>
                 </form>
             </div>
         </div>

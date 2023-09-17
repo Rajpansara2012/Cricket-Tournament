@@ -1,13 +1,16 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";  
+import axios from "axios";
+import Cookies from 'js-cookie';
+
+
 function User_home() {
   const navigate = useNavigate();
   const [tournaments, setTournaments] = useState([]);
   const [selectedTournament, setSelectedTournament] = useState();
   const [isShow, setIsShow] = useState(false);
   const [formData, setFormData] = useState({
-    tournament_name : "",
+    tournament_name: "",
     team_name: "",
     players: Array(11).fill({ player_name: "", player_type: "" }),
   });
@@ -19,84 +22,71 @@ function User_home() {
     updatedPlayer[name] = value;
     updatedPlayers[index] = updatedPlayer;
     setFormData({ ...formData, players: updatedPlayers });
-}; 
+  };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     formData.tournament_name = selectedTournament.tournament_name
     try {
-         await axios.post(
-            "http://localhost:8082/user/add_team",
-            formData,
-            {
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                withCredentials: true,
-            }
-        );
-            // console.log(response.data.message)
+      await axios.post(
+        "http://localhost:8082/user/add_team",
+        formData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      );
+      // console.log(response.data.message)
     } catch (error) {
-        // navigate("/Login")
-        console.log(error);
+      // navigate("/Login")
+      console.log(error);
     }
 
     // Clear the form and close it after submission
-    setFormData({tournament_name:"", team_name: "", players: Array(11).fill({ player_name: "", player_type: "" }) });
+    setFormData({ tournament_name: "", team_name: "", players: Array(11).fill({ player_name: "", player_type: "" }) });
     setIsShow(false);
   };
 
   useEffect(() => {
+    const userfind = Cookies.get('token');
+    if (userfind === undefined) {
+      navigate("/Login")
+    }
     const fetchTournaments = async () => {
-        try {
-            const response = await axios.post(
-                "http://localhost:8082/user/showall_tournament",
-                {},
-                {
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    withCredentials: true,
-                }
-            );
-            setTournaments(response.data.tournament);
-        } catch (error) {
-            // navigate("/Login")
-            console.log(error);
-        }
+      try {
+        const response = await axios.post(
+          "http://localhost:8082/user/showall_tournament",
+          {},
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+            withCredentials: true,
+          }
+        );
+        setTournaments(response.data.tournament);
+      } catch (error) {
+        // navigate("/Login")
+        console.log(error);
+      }
     };
     fetchTournaments();
-}, []);
+  }, []);
 
   const addTeamHandler = async (tournament) => {
-    if(tournament === selectedTournament && isShow) {
-        setIsShow(false)
+    if (tournament === selectedTournament && isShow) {
+      setIsShow(false)
     }
     else {
-        setSelectedTournament(tournament);
-        setIsShow(true);
+      setSelectedTournament(tournament);
+      setIsShow(true);
     }
   };
-  const handleLogout = async () => {
-    try {
-        await axios.post("http://localhost:8082/auth/logout",
-            {},
-            {
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                withCredentials: true,
-            }
-        )
-        navigate("/Login")
-    }
-    catch (error) {
-        console.log(error);
-    }
-}
+
   return (
     <div>
-      <button onClick={handleLogout}>Logout</button>
       <h1>Tournaments List</h1>
       {tournaments.map((tournament) => (
         <li key={tournament.id}>
@@ -144,9 +134,9 @@ function User_home() {
                         className="w-full p-2 border rounded focus:ring focus:ring-blue-300"
                       >
                         <option value="batsmen">batsmen</option>
-                            <option value="bowler">bowler</option>
-                            <option value="all-rounder">all-rounder</option>
-                        </select>
+                        <option value="bowler">bowler</option>
+                        <option value="all-rounder">all-rounder</option>
+                      </select>
                     </div>
                   ))}
                   <button
