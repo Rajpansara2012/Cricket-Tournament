@@ -2,7 +2,7 @@ import axios from "axios";
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import Cookies from 'js-cookie';
-function Login() {
+function Login(props) {
 
     useEffect(() => {
         const userfind = Cookies.get('token');
@@ -42,6 +42,7 @@ function Login() {
             )
             const userData = response.data.user;
             console.log(response)
+            props.setuser(response.data.user.type);
             if (response.data.user.type == "admin")
                 navigate("/Admin_home");
             else

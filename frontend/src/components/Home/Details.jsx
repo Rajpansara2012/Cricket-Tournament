@@ -1,15 +1,14 @@
-import React from 'react'
-import axios from "axios";
-
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
 const Details = (props) => {
     const teamsid = props.teamsid;
-    const [teams, setteams] = useState(null);
+    const [teams, setTeams] = useState([]);
+    const [loading, setLoading] = useState(true); // Add loading state
+
     useEffect(() => {
-        const fatchteam = async () => {
+        const fetchTeams = async () => {
             try {
-                // console.log(teamsid)
                 const response = await axios.post(
                     "http://localhost:8082/admin/teams",
                     { teamsid },
@@ -19,19 +18,22 @@ const Details = (props) => {
                         },
                         withCredentials: true,
                     }
-                )
-                setteams(response.data.allteams)
+                );
+                setTeams(response.data.allteams);
+                setLoading(false); // Set loading to false after data is fetched
             } catch (error) {
                 console.log(error);
+                setLoading(false); // Set loading to false on error
             }
         };
-        fatchteam();
+        fetchTeams();
     }, []);
 
     return (
         <div>
-
-            {teams && teams.length > 0 ? (
+            {loading ? (
+                <p>Loading...</p>
+            ) : teams && teams.length > 0 ? (
                 teams.map((team) => (
                     <li key={team.id}>{team.team_name}</li>
                 ))
@@ -39,7 +41,7 @@ const Details = (props) => {
                 <p>No teams available</p>
             )}
         </div>
-    )
-}
+    );
+};
 
-export default Details
+export default Details;

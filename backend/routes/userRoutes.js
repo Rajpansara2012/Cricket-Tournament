@@ -1,7 +1,7 @@
 const express = require('express');
-const Tournament = require('../module/tournament');
-const Team = require('../module/team');
-const Player = require('../module/player');
+const Tournament = require('../models/tournament');
+const Team = require('../models/team');
+const Player = require('../models/player');
 
 const { isauthenticated } = require('../middleware/auth');
 const router = express.Router();

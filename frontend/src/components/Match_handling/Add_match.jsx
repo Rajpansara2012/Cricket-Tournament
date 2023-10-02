@@ -124,6 +124,13 @@ function Add_match() {
                 }
             )
             console.log(response)
+            const { team1, team2, player1, player2 } = response.data;
+            localStorage.setItem('team1', JSON.stringify(team1));
+            localStorage.setItem('team2', JSON.stringify(team2));
+            localStorage.setItem('player1', JSON.stringify(player1));
+            localStorage.setItem('player2', JSON.stringify(player2));
+            Cookies.set('ball', 0);
+            navigate('/Scoring');
         }
         catch (error) {
             console.log(error);

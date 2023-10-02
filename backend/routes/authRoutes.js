@@ -1,6 +1,6 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
-const User = require('../module/user');
+const User = require('../models/user');
 const router = express.Router();
 
 router.post('/signup', async (req, res) => {
@@ -24,7 +24,13 @@ router.post('/login', async (req, res) => {
         const user = await User.findOne({ email });
         if (user && (await bcrypt.compare(password, user.password))) {
             // console.log(req.session.userId);
-            res.cookie('token', user._id, { expires: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000) }).json({ message: 'Logged in successfully.', user });
+            res.cookie('token', user._id, { expires: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000) });
+            res.cookie('user_type', user.type, { expires: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000) });
+            res.json({
+                message: "loging succsesful",
+                user: user
+            })
+
             // console.log(res.cookies)
         } else {
             res.status(401).json({ error: 'Invalid credentials.' });
@@ -50,7 +56,11 @@ router.post('/logout', (req, res) => {
     try {
         res.status(200).cookie("token", null, {
             expires: new Date(), httpOnly: true
-        }).json({
+        })
+        res.status(200).cookie("user_type", null, {
+            expires: new Date(), httpOnly: true
+        })
+        res.json({
             success: true,
             message: "Logged Out"
         })

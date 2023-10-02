@@ -1,4 +1,4 @@
-const User = require("../module/user");
+const User = require("../models/user");
 
 exports.isauthenticated = async (req, res, next) => {
     try {

@@ -2,7 +2,7 @@ import axios from "axios";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-function Logout() {
+function Logout(props) {
     const navigate = useNavigate();
 
     const handleLogout = async () => {
@@ -17,6 +17,7 @@ function Logout() {
                     withCredentials: true,
                 }
             );
+            props.setuser('');
             navigate("/Login");
         } catch (error) {
             console.log(error);

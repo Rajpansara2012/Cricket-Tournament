@@ -1,8 +1,11 @@
 const express = require('express');
-const Tournament = require('../module/tournament');
-const User = require('../module/user');
-const Match = require('../module/match');
-const Team = require('../module/team');
+const Tournament = require('../models/tournament');
+const User = require('../models/user');
+const { LocalStorage } = require('node-localstorage');
+const localStorage = new LocalStorage('scratch.txt');
+const Match = require('../models/match');
+const Team = require('../models/team');
+const Player = require('../models/player');
 const { isauthenticated } = require('../middleware/auth');
 
 const router = express.Router();
@@ -75,17 +78,25 @@ router.post('/add_match', isauthenticated, async (req, res) => {
                 toss_status
             });
             match.save();
+            const player1 = [];
+            for (var i = 0; i < team[0].players.length; i++) {
+                player1.push(await Player.findById(team[0].players[i]));
+            }
+            const player2 = [];
+            for (var i = 0; i < team[1].players.length; i++) {
+                player2.push(await Player.findById(team[1].players[i]));
+            }
+            res.cookie('match', JSON.stringify(match), { expires: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000) });
             if (toss == team[0].team_name && toss_status == "batting") {
-                res.cookie('team1', team[0], { expires: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000), httpOnly: true });
-                res.cookie('team2', team[1], { expires: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000), httpOnly: true });
 
+                // console.log(player1.length);
+                // console.log(player2.length);
+                res.json({ message: 'match added successfully.', match, team1: team[0], team2: team[1], player1, player2 });
             }
             else {
-                res.cookie('team1', team[1], { expires: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000), httpOnly: true });
-                res.cookie('team2', team[0], { expires: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000), httpOnly: true });
-            }
-            res.json({ message: 'match added successfully.', match, team1: team[0], team2: team[1] });
+                res.json({ message: 'match added successfully.', match, team1: team[1], team2: team[0], player2, player1 });
 
+            }
         }
     }
     catch (error) {
@@ -110,6 +121,54 @@ router.post('/teams', async (req, res) => {
     catch (error) {
         console.log(error);
         res.status(500).json({ error: 'An error occurred.' });
+    }
+});
+router.post('/update_score', async (req, res) => {
+    try {
+        const receivedData = req.body;
+        // console.log('hi' + receivedData.batsman1.batting_ball);
+        async function updateObject(updatedObjectFromFrontend) {
+            try {
+                const updatedObject = await Player.findByIdAndUpdate(
+                    updatedObjectFromFrontend._id,
+                    updatedObjectFromFrontend,
+                );
+                if (!updatedObject) {
+                    console.log('Object not found');
+                    return;
+                }
+
+                console.log(updatedObject.bowling_ball + '  ' + updatedObject.batting_ball);
+                // console.log();
+
+            } catch (err) {
+                console.error('Error updating object:', err);
+            }
+        }
+
+        async function updateMatch(updatedObjectFromFrontend) {
+            try {
+                const updatedObject = await Match.findByIdAndUpdate(
+                    updatedObjectFromFrontend._id,
+                    updatedObjectFromFrontend,
+                );
+                if (!updatedObject) {
+                    console.log('Object not found');
+                    return;
+                }
+
+                console.log(updatedObject.over);
+            } catch (err) {
+                console.error('Error updating object:', err);
+            }
+        }
+        updateObject(receivedData.batsman1);
+        updateObject(receivedData.batsman2);
+        updateObject(receivedData.bowler);
+        updateMatch(receivedData.match);
+    }
+    catch (e) {
+        console.log(e.message);
     }
 });
 // router.get('/tdetails', async (req, res) => {
