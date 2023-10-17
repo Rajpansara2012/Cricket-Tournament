@@ -2,6 +2,8 @@ import axios from "axios";
 import { useState } from "react";
 // import "/common.css";
 import { useNavigate, Link } from "react-router-dom";
+
+
 function Signup() {
     const [formData, setFormData] = useState({
         username: "",
@@ -12,7 +14,6 @@ function Signup() {
     const navigate = useNavigate();
     const handleChange = (event) => {
         const { name, value } = event.target;
-
 
         setFormData((prevFormData) => ({
             ...prevFormData,
@@ -39,6 +40,7 @@ function Signup() {
             console.log(error);
         }
     }
+   
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-100">
             <div className="bg-white p-8 rounded shadow-md w-96">
@@ -54,7 +56,9 @@ function Signup() {
                             value={formData.type}
                             onChange={handleChange}
                             className="w-full p-2 border rounded focus:ring focus:ring-blue-300"
+                            required
                         >
+                            <option value="">Select a user type</option>
                             <option value="user">User</option>
                             <option value="admin">Admin</option>
                         </select>

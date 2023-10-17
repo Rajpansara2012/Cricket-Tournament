@@ -33,8 +33,8 @@ router.post('/add_team', async (req, res) => {
         const userId = req.userId;
         const players_obj = req.body.players;
         const players = [];
-        for (var i = 0; i < players_name.length; i++) {
-            const player = new Player({ name: players_name[i], type: type[i] });
+        for (var i = 0; i < players_obj.length; i++) {
+            const player = new Player({ name: players_obj[i].player_name, type: players_obj[i].player_type });
             await player.save();
             players.push(player);
         }

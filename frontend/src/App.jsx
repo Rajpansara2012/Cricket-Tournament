@@ -22,6 +22,7 @@ function App() {
       setusertype('user')
     }
   }, []);
+  
   const setuser = (type) => {
     setusertype(type);
   }

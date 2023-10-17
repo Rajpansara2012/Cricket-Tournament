@@ -55,6 +55,7 @@ router.post('/add_match', isauthenticated, async (req, res) => {
         const venue = req.body.venue;
         const tournament_id = req.body.tournament_id;
         const tournament = await (Tournament.findById(tournament_id));
+        const winner = "";
         // console.log(tournamentId);
 
         const userId = req.userId;
@@ -70,13 +71,21 @@ router.post('/add_match', isauthenticated, async (req, res) => {
         else {
             const match = new Match({
                 team_name: [team_name1, team_name2],
+                teamId : [team[0]._id, team[1]._id],
                 total_over,
                 venue: venue,
                 tournamentId: tournament_id,
                 userId: userId,
                 toss,
-                toss_status
+                toss_status,
+                winner: winner
             });
+            match.over[0] = 0;
+            match.over[1] = 0;
+            match.score[0] = 0;
+            match.score[1] = 0;
+            match.wicket[0] = 0;
+            match.wicket[1] = 0;
             match.save();
             const player1 = [];
             for (var i = 0; i < team[0].players.length; i++) {
@@ -86,6 +95,22 @@ router.post('/add_match', isauthenticated, async (req, res) => {
             for (var i = 0; i < team[1].players.length; i++) {
                 player2.push(await Player.findById(team[1].players[i]));
             }
+            for(var i = 0; i < player1.length; i++) {
+                player1[i].batting_status = "remaing";
+                player2[i].batting_status = "remaing";
+            }
+            res
+                .cookie("bastman1", null, {
+                    expires: new Date()
+                })
+                .cookie("bastman2", null, {
+                    expires: new Date()
+                })
+                .cookie("bowler", null, {
+                    expires: new Date()
+                })
+                .status(200)
+
             res.cookie('match', JSON.stringify(match), { expires: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000) });
             if (toss == team[0].team_name && toss_status == "batting") {
 
@@ -138,9 +163,6 @@ router.post('/update_score', async (req, res) => {
                     return;
                 }
 
-                console.log(updatedObject.bowling_ball + '  ' + updatedObject.batting_ball);
-                // console.log();
-
             } catch (err) {
                 console.error('Error updating object:', err);
             }
@@ -156,8 +178,6 @@ router.post('/update_score', async (req, res) => {
                     console.log('Object not found');
                     return;
                 }
-
-                console.log(updatedObject.over);
             } catch (err) {
                 console.error('Error updating object:', err);
             }
@@ -166,8 +186,62 @@ router.post('/update_score', async (req, res) => {
         updateObject(receivedData.batsman2);
         updateObject(receivedData.bowler);
         updateMatch(receivedData.match);
+        res.json({ message: 'score updated...'});
     }
     catch (e) {
+        console.log(e.message);
+        res.status(500).json({ error: 'An error occurred.' });
+    }
+});
+
+router.post('/save_player', async(req,res) => {
+    try{
+        const receivedData = req.body;
+        const matchObj = await Match.findById(receivedData._id);
+        const m = matchObj;
+        // console.log(m.winner)
+        const t1Id = m.teamId[0];
+        const t2Id = m.teamId[1];
+        const team1Obj = await(Team.findById(t1Id));
+        const team2Obj = await(Team.findById(t2Id));
+        for(var i = 0; i < 11; i++) {
+            const p1 = await(Player.findById(team1Obj.players[i]));
+            const p2 = await(Player.findById(team2Obj.players[i]));
+            console.log(p1);
+            console.log(p2);
+            m.players1.push(p1);
+            m.players2.push(p2);
+        }
+        m.save();
+        for(var i = 0; i < 11; i++) {
+            const p1 = await(Player.findById(team1Obj.players[i]));
+            const p2 = await(Player.findById(team2Obj.players[i]));
+            p1.batting_status = "remaining";
+            p1.batting_run = null;
+            p1.batting_ball = null;
+            p1.strike_rate = null;
+            p1.fours = null;
+            p1.sixes = null;
+            p1.bowling_ball = null;
+            p1.bowling_run = null;
+            p1.wicket = null;
+            p1.economy = null;
+            p1.save();
+            p2.batting_status = "remaining";
+            p2.batting_run = null;
+            p2.batting_ball = null;
+            p2.strike_rate = null;
+            p2.fours = null;
+            p2.sixes = null;
+            p2.bowling_ball = null;
+            p2.bowling_run = null;
+            p2.wicket = null;
+            p2.economy = null;
+            p2.save();
+        }
+        res.json({ message: 'player Saved...'});
+
+    }catch(e) {
         console.log(e.message);
     }
 });

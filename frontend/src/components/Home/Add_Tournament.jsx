@@ -39,6 +39,8 @@ function Add_Tournament() {
                 }
             )
             console.log(response)
+            navigate("/Admin_home")
+
         }
         catch (error) {
             console.log(error);
