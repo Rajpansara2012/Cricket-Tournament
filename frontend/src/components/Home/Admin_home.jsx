@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Details from "./Details";
 
 function Admin_home() {
@@ -52,19 +52,11 @@ function Admin_home() {
     // }
     return (
         <div>
-            {/* <button onClick={handleLogout}>
-                Logout
-            </button>
-            <button onClick={handleTournament}>
-                Add tournament
-            </button>
-            <button onClick={handleMatch}>
-                Add Match
-            </button> */}
+
             <h1>Tournaments List</h1>
 
-            {tournaments.map((tournament) => (
-                <li key={tournament.id}>
+            {tournaments.map((tournament, index) => (
+                <li key={tournament._id}>
                     <button onClick={() => handleTournamentClick(tournament)}>
                         {tournament.tournament_name}
                     </button>

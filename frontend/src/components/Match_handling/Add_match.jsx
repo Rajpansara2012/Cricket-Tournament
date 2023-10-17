@@ -6,7 +6,7 @@ import Cookies from 'js-cookie';
 
 function Add_match() {
     const navigate = useNavigate();
-
+    const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
         total_over: "",
         toss: "",
@@ -89,7 +89,7 @@ function Add_match() {
                 setFormData(updatedFormData);
             }
         }
-        // console.log(event.target.value);
+
     };
 
     const handleTeamSelect2 = (event) => {
@@ -111,6 +111,7 @@ function Add_match() {
     // console.log(showform);
     const handleSubmit = async (event) => {
         event.preventDefault();
+        setLoading(true);
         console.log(formData);
         try {
             const response = await axios.post(
@@ -130,7 +131,10 @@ function Add_match() {
             localStorage.setItem('player1', JSON.stringify(player1));
             localStorage.setItem('player2', JSON.stringify(player2));
             Cookies.set('ball', 0);
-            navigate('/Scoring');
+            setTimeout(() => {
+                setLoading(false);
+                navigate('/Scoring');
+            }, 1000);
         }
         catch (error) {
             console.log(error);
@@ -146,104 +150,108 @@ function Add_match() {
     };
     return (
         <>
-            {/* <h1>Tournaments</h1> */}
-            <div className="min-h-screen flex items-center justify-center bg-gray-100">
-                <div className="bg-white p-8 rounded shadow-md md:w-96 w-full">
-                    <form onSubmit={handleSubmit} action="">
-                        <label>Select a Tournament:</label>
-                        <select onChange={handleTournamentSelect}>
-                            <option value="">Select a tournament</option>
-                            {tournaments.map((tournament) => (
-                                <option key={tournament._id} value={JSON.stringify(tournament)}>
-                                    {tournament.tournament_name}
-                                </option>
-                            ))}
-                        </select>
-                        {isshow && <h2>Select First Team</h2>}
-                        {isshow &&
-                            <select id="firstselect" onChange={handleTeamSelect1}>
-                                <option value="option1">Select a team</option>
-                                {isshow && teams && teams.map((team) => (
-                                    <option key={team._id} value={JSON.stringify(team)}>
-                                        {team.team_name}
+            {loading ? (
+                // Render a loading spinner while loading is true
+                <div className="loader">Loading...</div>
+            ) : (
+                <div className="min-h-screen flex items-center justify-center bg-gray-100">
+                    <div className="bg-white p-8 rounded shadow-md md:w-96 w-full">
+                        <form onSubmit={handleSubmit} action="">
+                            <label>Select a Tournament:</label>
+                            <select onChange={handleTournamentSelect}>
+                                <option value="">Select a tournament</option>
+                                {tournaments.map((tournament) => (
+                                    <option key={tournament._id} value={JSON.stringify(tournament)}>
+                                        {tournament.tournament_name}
                                     </option>
-                                ))
-                                }
-                            </select>}
+                                ))}
+                            </select>
+                            {isshow && <h2>Select First Team</h2>}
+                            {isshow &&
+                                <select id="firstselect" onChange={handleTeamSelect1}>
+                                    <option value="option1">Select a team</option>
+                                    {isshow && teams && teams.map((team) => (
+                                        <option key={team._id} value={JSON.stringify(team)}>
+                                            {team.team_name}
+                                        </option>
+                                    ))
+                                    }
+                                </select>}
 
-                        {isshow && <h2>Select Second Team</h2>}
-                        {isshow &&
-                            <select id="secondselect" onChange={handleTeamSelect2}>
-                                <option value="option1">Select a team</option>
-                                {isshow && teams && teams.map((team) => (
-                                    <option key={team._id} value={JSON.stringify(team)}>
-                                        {team.team_name}
-                                    </option>
-                                ))
-                                }
-                            </select>}
+                            {isshow && <h2>Select Second Team</h2>}
+                            {isshow &&
+                                <select id="secondselect" onChange={handleTeamSelect2}>
+                                    <option value="option1">Select a team</option>
+                                    {isshow && teams && teams.map((team) => (
+                                        <option key={team._id} value={JSON.stringify(team)}>
+                                            {team.team_name}
+                                        </option>
+                                    ))
+                                    }
+                                </select>}
 
-                        {showform && <><div className="mb-4">
-                            <input
-                                type="number"
-                                name="total_over"
-                                value={formData.total_over}
-                                onChange={handleChange}
-                                className="w-full p-2 border rounded focus:ring focus:ring-blue-300"
-                                placeholder="total over"
-                                min="1"
-                                step="1"
-                                required
-                            />
-                        </div>
-                            <div className="mb-4">
-                                <select
-                                    name="toss"
-                                    value={formData.toss}
-                                    onChange={handleChange}
-                                    className="w-full p-2 border rounded focus:ring focus:ring-blue-300"
-                                    required
-                                >
-                                    <option value="">Select toss win team</option>
-                                    <option value={selectedTeamOne.team_name}>{selectedTeamOne.team_name}</option>
-                                    <option value={selectedTeamSecond.team_name}>{selectedTeamSecond.team_name}</option>
-                                </select>
-
-                            </div>
-                            <div className="mb-4">
-                                <select
-                                    name="toss_status"
-                                    value={formData.toss_status}
-                                    onChange={handleChange}
-                                    className="w-full p-2 border rounded focus:ring focus:ring-blue-300"
-                                    required
-                                >
-                                    <option value="">Select an option</option>
-                                    <option value="batting">Batting</option>
-                                    <option value="bowling">Bowling</option>
-                                </select>
-                            </div>
-                            <div className="mb-4">
+                            {showform && <><div className="mb-4">
                                 <input
-                                    type="text"
-                                    name="venue"
-                                    value={formData.venue}
+                                    type="number"
+                                    name="total_over"
+                                    value={formData.total_over}
                                     onChange={handleChange}
                                     className="w-full p-2 border rounded focus:ring focus:ring-blue-300"
-                                    placeholder="venue"
+                                    placeholder="total over"
+                                    min="1"
+                                    step="1"
                                     required
                                 />
                             </div>
-                            <button
-                                type="submit"
-                                className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600"
-                            >
-                                Add Match
-                            </button>
-                        </>}
-                    </form>
+                                <div className="mb-4">
+                                    <select
+                                        name="toss"
+                                        value={formData.toss}
+                                        onChange={handleChange}
+                                        className="w-full p-2 border rounded focus:ring focus:ring-blue-300"
+                                        required
+                                    >
+                                        <option value="">Select toss win team</option>
+                                        <option value={selectedTeamOne.team_name}>{selectedTeamOne.team_name}</option>
+                                        <option value={selectedTeamSecond.team_name}>{selectedTeamSecond.team_name}</option>
+                                    </select>
+
+                                </div>
+                                <div className="mb-4">
+                                    <select
+                                        name="toss_status"
+                                        value={formData.toss_status}
+                                        onChange={handleChange}
+                                        className="w-full p-2 border rounded focus:ring focus:ring-blue-300"
+                                        required
+                                    >
+                                        <option value="">Select an option</option>
+                                        <option value="batting">Batting</option>
+                                        <option value="bowling">Bowling</option>
+                                    </select>
+                                </div>
+                                <div className="mb-4">
+                                    <input
+                                        type="text"
+                                        name="venue"
+                                        value={formData.venue}
+                                        onChange={handleChange}
+                                        className="w-full p-2 border rounded focus:ring focus:ring-blue-300"
+                                        placeholder="venue"
+                                        required
+                                    />
+                                </div>
+                                <button
+                                    type="submit"
+                                    className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600"
+                                >
+                                    Add Match
+                                </button>
+                            </>}
+                        </form>
+                    </div>
                 </div>
-            </div>
+            )}
         </>
     )
 }

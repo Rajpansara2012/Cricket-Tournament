@@ -11,6 +11,7 @@ const match = new mongoose.Schema({
     winner: String,
     venue: String,
     total_over: Number,
+    
 });
 
 module.exports = mongoose.model('match', match);
