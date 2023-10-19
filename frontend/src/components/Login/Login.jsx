@@ -2,19 +2,25 @@ import axios from "axios";
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import Cookies from 'js-cookie';
+
 function Login(props) {
-
-    useEffect(() => {
-        const userfind = Cookies.get('token');
-        if (userfind != undefined) {
-            navigate("/Admin_home")
-        }
-    }, []);
-
     const [formData, setFormData] = useState({
         email: "",
         password: ""
     });
+
+    const [error, setError] = useState(""); // State for error message
+
+    useEffect(() => {
+        const userfind = Cookies.get('token');
+        const usertype = Cookies.get('user_type');
+        if (userfind !== undefined && usertype == 'admin') {
+            navigate("/Admin_home");
+        }
+        else if (userfind !== undefined && usertype == 'user') {
+            navigate("/User_home");
+        }
+    }, []);
 
     const navigate = useNavigate();
 
@@ -39,24 +45,30 @@ function Login(props) {
                     },
                     withCredentials: true,
                 }
-            )
-            const userData = response.data.user;
-            console.log(response)
-            props.setuser(response.data.user.type);
-            if (response.data.user.type == "admin")
-                navigate("/Admin_home");
-            else
-                navigate("/User_home");
+            );
 
-        }
-        catch (error) {
+            const userData = response.data.user;
+            props.setuser(response.data.user.type);
+
+            if (response.data.user.type === "admin") {
+                navigate("/Admin_home");
+            } else {
+                navigate("/User_home");
+            }
+
+        } catch (error) {
+            setError("Invalid email or password");
             console.log(error);
         }
     }
+
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-100">
             <div className="bg-white p-8 rounded shadow-md md:w-96 w-full">
                 <h2 className="text-2xl font-semibold mb-4 text-center">Login</h2>
+                {error && (
+                    <p className="text-red-500 text-center mb-4">{error}</p>
+                )}
                 <form onSubmit={handleSubmit} action="">
                     <div className="mb-4">
                         <input
@@ -87,7 +99,7 @@ function Login(props) {
                     <p className="mt-4 text-center">
                         haven't account?{" "}
                         <Link to="/Signup" className="text-blue-500">
-                            Singup
+                            Signup
                         </Link>
                     </p>
                 </form>
@@ -95,4 +107,5 @@ function Login(props) {
         </div>
     );
 }
-export default Login
+
+export default Login;

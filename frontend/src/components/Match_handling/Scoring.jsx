@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import Cookies from "js-cookie";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
+import { TailSpin } from "react-loader-spinner";
 
 function Scoring() {
   const navigate = useNavigate();
@@ -18,6 +19,7 @@ function Scoring() {
   const [batting, setbatting] = useState(1);
   const [temp, settemp] = useState(1);
   const [iswicket, setiswicket] = useState(0);
+  const [isLoding, setIsLoding] = useState(false);
   useEffect(() => {
     const bat1 = Cookies.get("bastman1");
     const bat2 = Cookies.get("bastman2");
@@ -49,7 +51,7 @@ function Scoring() {
       alert("can't select same player.");
     } else {
       setbatsman1(player);
-      if (batsman2 != null) {
+      if (batsman2 != null && match.over[0] != match.total_over) {
         setisshow(1);
       }
     }
@@ -85,20 +87,42 @@ function Scoring() {
     if (parseInt(Cookies.get("ball")) % 6 == 0) {
       console.log("in if overchang");
 
-      // console.log(batsman1)
-      // console.log(batsman2)
       Cookies.set("bowler", JSON.stringify(bowler));
       Cookies.set("match", JSON.stringify(match));
-      // console.log(Cookies.get('bastman1'));
-      // console.log(Cookies.get('bastman2'));
+
       if (batting == 1 && (match.over[0]) != parseFloat(match.total_over)) {
-        console.log(match.over[1])
-        console.log(match.total_over)
-        console.log(batting);
+        var foundIndex = player2.findIndex(function (player) {
+
+          return player._id === bowler._id;
+        });
+
+        player2[foundIndex].bowling_ball = bowler.bowling_ball;
+        player2[foundIndex].bowling_run = bowler.bowling_run;
+        player2[foundIndex].economy = bowler.economy;
+        player2[foundIndex].wicket = bowler.wicket;
+
+        localStorage.setItem("player2", JSON.stringify(player2));
         setisshow(1);
+      }
+      if (batting == 1 && (match.over[0]) == parseFloat(match.total_over)) {
+        console.log("1111111111111111111111111111111111")
+        // setbatsman1(null)
+        setbatsman2(null)
+        setisshow(0);
       }
       if (batting == 2 && (match.over[1]) != parseFloat(match.total_over)) {
         console.log(batting);
+        var foundIndex = player2.findIndex(function (player) {
+
+          return player._id === bowler._id;
+        });
+
+        player2[foundIndex].bowling_ball = bowler.bowling_ball;
+        player2[foundIndex].bowling_run = bowler.bowling_run;
+        player2[foundIndex].economy = bowler.economy;
+        player2[foundIndex].wicket = bowler.wicket;
+
+        localStorage.setItem("player2", JSON.stringify(player2));
         setisshow(1);
       }
       strike_change();
@@ -176,20 +200,20 @@ function Scoring() {
       strike_change();
     } else if (value == 4) {
       if (batsman1.four == null) {
-        batsman1.four = 1;
+        batsman1.fours = 1;
       } else {
-        batsman1.four += 1;
+        batsman1.fours += 1;
       }
     } else if (value == 6) {
       if (batsman1.six == null) {
-        batsman1.six = 1;
+        batsman1.sixes = 1;
       } else {
-        batsman1.six += 1;
+        batsman1.sixes += 1;
       }
     }
     bowler.bowling_run += value;
     bowler.bowling_ball += 1;
-    bowler.economy = (bowler.bowling_run / bowler.bowling_ball) * 6;
+    bowler.economy = parseFloat((bowler.bowling_run / bowler.bowling_ball)) * 6;
     var o = Math.floor((ball + 1) / 6);
     var currentball = (ball + 1) % 6;
     Cookies.set("ball", ball + 1);
@@ -209,6 +233,9 @@ function Scoring() {
         match.score[0] += value;
       }
       // console.log('hi');
+      match.commentary[0].push(
+        match.over[0] + " " + batsman1.name + " to " + bowler.name + " " + value + " run"
+      );
     } else {
       if (match) {
         if (match.over[1] == null) {
@@ -219,18 +246,21 @@ function Scoring() {
           match.score.push(0);
         }
         match.score[1] += value;
+        match.commentary[1].push(
+          match.over[1] + " " + batsman1.name + " to " + bowler.name + " " + value + " run"
+        );
       }
     }
     Cookies.set("match", JSON.stringify(match));
     handleInningend();
-
-
   }
+
   const handleZero = async (event) => {
     score(0);
     backend_call();
     over_change();
   };
+
   const handleOne = async (event) => {
     console.log("from handleOne");
     console.log(Cookies.get("bastman1"));
@@ -241,36 +271,81 @@ function Scoring() {
     if (parseInt(Cookies.get("ball")) % 6 != 0) {
       over_change();
     } else if (batting == 1 && match.over[0] != match.total_over) {
+      var foundIndex = player2.findIndex(function (player) {
+
+        return player._id === bowler._id;
+      });
+
+      player2[foundIndex].bowling_ball = bowler.bowling_ball;
+      player2[foundIndex].bowling_run = bowler.bowling_run;
+      player2[foundIndex].economy = bowler.economy;
+      player2[foundIndex].wicket = bowler.wicket;
+
+      localStorage.setItem("player2", JSON.stringify(player2));
       setisshow(1);
     }
     else if (batting == 2 && match.over[1] != match.total_over) {
+      var foundIndex = player2.findIndex(function (player) {
+
+        return player._id === bowler._id;
+      });
+
+      player2[foundIndex].bowling_ball = bowler.bowling_ball;
+      player2[foundIndex].bowling_run = bowler.bowling_run;
+      player2[foundIndex].wicket = bowler.wicket;
+      player2[foundIndex].economy = bowler.economy;
+      localStorage.setItem("player2", JSON.stringify(player2));
       setisshow(1);
     }
   };
+
   const handleTwo = async (event) => {
     score(2);
     backend_call();
 
     over_change();
   };
+
   const handleThree = (event) => {
     score(3);
     backend_call();
     if (parseInt(Cookies.get("ball")) % 6 != 0) {
       over_change();
     } else if (batting == 1 && match.over[0] != match.total_over) {
+      var foundIndex = player2.findIndex(function (player) {
+
+        return player._id === bowler._id;
+      });
+
+      player2[foundIndex].bowling_ball = bowler.bowling_ball;
+      player2[foundIndex].bowling_run = bowler.bowling_run;
+      player2[foundIndex].economy = bowler.economy;
+      player2[foundIndex].wicket = bowler.wicket;
+      localStorage.setItem("player2", JSON.stringify(player2));
       setisshow(1);
     }
     else if (batting == 2 && match.over[1] != match.total_over) {
+      var foundIndex = player2.findIndex(function (player) {
+
+        return player._id === bowler._id;
+      });
+
+      player2[foundIndex].bowling_ball = bowler.bowling_ball;
+      player2[foundIndex].bowling_run = bowler.bowling_run;
+      player2[foundIndex].economy = bowler.economy;
+      player2[foundIndex].wicket = bowler.wicket;
+      localStorage.setItem("player2", JSON.stringify(player2));
       setisshow(1);
     }
   };
+
   const handleFour = (event) => {
     score(4);
     backend_call();
 
     over_change();
   };
+
   const handleSix = (event) => {
     score(6);
     backend_call();
@@ -286,12 +361,15 @@ function Scoring() {
   };
 
   const handleWicket = (event) => {
+    if (bowler.wicket == null) {
+      bowler.wicket = 0;
+    }
     bowler.wicket += 1;
     bowler.bowling_ball += 1;
     console.log(bowler.wicket);
     var ball = parseInt(Cookies.get("ball"));
-    var o = Math.floor(ball / 6);
-    var currentball = ball % 6;
+    var o = Math.floor((ball + 1) / 6);
+    var currentball = (ball + 1) % 6;
     Cookies.set("ball", ball + 1);
     Cookies.set("bowler", JSON.stringify(bowler));
     if (batting == 1) {
@@ -303,6 +381,7 @@ function Scoring() {
         match.over.push(0);
       }
       match.over[0] = o + currentball / 10;
+      match.commentary[0].push(match.over[0] + " " + bowler.name + " take wicket of " + batsman1.name);
 
     } else {
       if (match.wicket[1] == null) {
@@ -313,6 +392,7 @@ function Scoring() {
         match.over.push(0);
       }
       match.over[1] = o + currentball / 10;
+      match.commentary[1].push(match.over[1] + " " + bowler.name + " take wicket of " + batsman1.name);
     }
     Cookies.set("match", JSON.stringify(match));
 
@@ -327,45 +407,319 @@ function Scoring() {
     player1[foundIndex].batting_status = "out";
     localStorage.setItem("player1", JSON.stringify(player1));
     backend_call();
-    if (parseInt(Cookies.get("ball")) % 6 == 0) {
-      console.log("in if overchang");
-
-      // console.log(batsman1)
-      // console.log(batsman2)
+    if (parseInt(Cookies.get("ball")) % 6 == 0 && (match.over[0] != match.total_over || match.over[1] != match.total_over)) {
       Cookies.set("bowler", JSON.stringify(bowler));
       Cookies.set("match", JSON.stringify(match));
-      // console.log(Cookies.get('bastman1'));
-      // console.log(Cookies.get('bastman2'));
+      var foundIndex = player2.findIndex(function (player) {
 
+        return player._id === bowler._id;
+      });
+
+      player2[foundIndex].bowling_ball = bowler.bowling_ball;
+      player2[foundIndex].bowling_run = bowler.bowling_run;
+      player2[foundIndex].wicket = bowler.wicket;
+      player2[foundIndex].economy = bowler.economy;
+      localStorage.setItem("player2", JSON.stringify(player2));
       setisshow(1);
       strike_change();
     }
     if (batting == 1) {
-      if (match.wicket[0] != 10)
+      if (match.wicket[0] != 10 && match.over[0] != match.total_over)
         setiswicket(1);
-      if (match.wicket[0] == 10) {
-        handleInningend();
+
+    }
+    else {
+      if (match.wicket[1] != 10 && match.over[1] != match.total_over)
+        setiswicket(1);
+
+    }
+    handleInningend();
+  };
+  function customPrompt(message, options) {
+    var optionString = options.join("\n");
+    var fullMessage = message + "\n\n" + optionString;
+
+    var result = window.confirm(fullMessage);
+
+    if (result) {
+      var selectedOption = prompt("Enter your choice (0, 1, 2, 3, 4):");
+      if (options.includes(selectedOption)) {
+        return selectedOption;
+      } else {
+        alert("Invalid choice. Please select one of the options: " + options.join(", "));
+        return -1;
       }
     }
     else {
-      if (match.wicket[1] != 10)
-        setiswicket(1);
-      if (match.wicket[1] == 10) {
-        handleInningend();
+      return -1;
+    }
+  }
+
+  const handleWide = (event) => {
+    bowler.bowling_run += 1;
+    var options = ["0", "1", "2", "3", "4"];
+    var extra = parseInt(customPrompt("Please select an option:", options));
+    if (extra == -1) {
+      return;
+    }
+    bowler.bowling_run += extra;
+    settemp(0);
+    if (batting == 1) {
+      if (match) {
+        match.commentary[0].push(match.over[0] + " " + batsman1.name + " to " + bowler.name + " wide");
+        // console.log(match.over[0])
+        if (match.score[0] == null) {
+          match.score.push(0);
+        }
+        match.score[0] += (extra + 1);
+      }
+      // console.log('hi');
+    } else {
+      if (match) {
+        match.commentary[1].push(match.over[1] + " " + batsman1.name + " to " + bowler.name + " wide");
+        if (match.score[1] == null) {
+          match.score.push(0);
+        }
+        match.score[1] += (extra + 1);
       }
     }
+    Cookies.set("bowler", JSON.stringify(bowler));
+    Cookies.set("match", JSON.stringify(match));
+    if (parseInt(extra) == 1 || parseInt(extra) == 3) {
+      strike_change();
+    }
+    over_change();
+    handleInningend();
+    backend_call();
+
   };
-  const handleWide = (event) => { };
-  const handleNoball = (event) => { };
-  const handleFreehit = (event) => { };
-  const handleBye = (event) => { };
-  const handleInningend = (event) => {
+  function noBallcustomPrompt(message, options) {
+    var optionString = options.join("\n");
+    var fullMessage = message + "\n\n" + optionString;
+
+    var result = window.confirm(fullMessage);
+
+    if (result) {
+      var selectedOption = prompt("Enter your choice (0, 1, 2, 3, 4, 6, bye):");
+      if (options.includes(selectedOption)) {
+        // Handle the selected option here
+        return selectedOption;
+      } else {
+        alert("Invalid choice. Please select one of the options: " + options.join(", "));
+        return -1;
+      }
+    }
+    else {
+      return -1;
+    }
+  }
+
+  const handleNoball = (event) => {
+    bowler.bowling_run += 1;
+    var options = ["0", "1", "2", "3", "4", "6", "Bye"];
+    var extra = noBallcustomPrompt("Please select an option:", options);
+    if (extra == "Bye") {
+      handleBye();
+    } else if (parseInt(extra) == -1) {
+      return;
+    }
+    else {
+      bowler.bowling_run += parseInt(extra);
+      batsman1.batting_run += parseInt(extra);
+      batsman1.batting_ball += 1;
+      if (batting == 1) {
+        if (match) {
+          // console.log(match.over[0])
+          if (match.score[0] == null) {
+            match.score.push(0);
+          }
+          match.score[0] += (parseInt(extra) + 1);
+          match.commentary[0].push(
+            match.over[0] + " " +
+            batsman1.name + " to " + bowler.name + " no ball"
+          );
+        }
+        // console.log('hi');
+      } else {
+        if (match) {
+          if (match.score[1] == null) {
+            match.score.push(0);
+          }
+          match.score[1] += (parseInt(extra) + 1);
+          match.commentary[1].push(
+            match.over[1] + " " +
+            batsman1.name + " to " + bowler.name + " no ball"
+          );
+        }
+      }
+    }
+    Cookies.set("bowler", JSON.stringify(bowler));
+    Cookies.set("match", JSON.stringify(match));
+    Cookies.set("bastman1", JSON.stringify(batsman1));
+    if (parseInt(extra) == 1 || parseInt(extra) == 3) {
+      strike_change();
+    }
+    over_change();
+    settemp(temp + 1);
+    handleInningend();
+    backend_call();
+  };
+
+  const handleFreehit = (event) => {
+    var options = ["0", "1", "2", "3", "4", "6", "Bye"];
+    var extra = noBallcustomPrompt("Please select an option:", options);
+    if (extra == "Bye") {
+      handleBye();
+    } else if (parseInt(extra) == -1) {
+      return;
+    }
+    else {
+      bowler.bowling_run += parseInt(extra);
+      bowler.bowling_ball += 1;
+      batsman1.batting_run += parseInt(extra);
+      batsman1.batting_ball += 1;
+      bowler.economy = parseFloat((bowler.bowling_run / bowler.bowling_ball)) * 6;
+      var ball = parseInt(Cookies.get("ball"));
+      var o = Math.floor((ball + 1) / 6);
+      var currentball = (ball + 1) % 6;
+      Cookies.set("ball", ball + 1);
+      Cookies.set("bowler", JSON.stringify(bowler));
+
+      if (batting == 1) {
+        if (match) {
+          if (match.over[0] == null) {
+            match.over.push(0);
+          }
+          // console.log(match.over[0])
+          match.over[0] = o + currentball / 10;
+          // console.log(match.over[0])
+          if (match.score[0] == null) {
+            match.score.push(0);
+          }
+          match.score[0] += parseInt(extra);
+          match.commentary[0].push(
+            match.over[0] + " " +
+            batsman1.name + " to " + bowler.name + " free hit " + parseInt(extra)
+          );
+        }
+        // console.log('hi');
+      } else {
+        if (match) {
+          if (match.over[1] == null) {
+            match.over.push(0);
+          }
+          match.over[1] = o + currentball / 10;
+          if (match.score[1] == null) {
+            match.score.push(0);
+          }
+          match.score[1] += parseInt(extra);
+          match.commentary[1].push(
+            match.over[1] + " " +
+            batsman1.name + " to " + bowler.name + " free hit " + parseInt(extra)
+          );
+        }
+      }
+      Cookies.set("bowler", JSON.stringify(bowler));
+      Cookies.set("match", JSON.stringify(match));
+      Cookies.set("bastman1", JSON.stringify(batsman1));
+      if (parseInt(extra) == 1 || parseInt(extra) == 3) {
+        strike_change();
+      }
+      over_change();
+      settemp(0);
+      handleInningend();
+      backend_call();
+    }
+  };
+
+  const handleBye = (event) => {
+    var options = ["0", "1", "2", "3", "4"];
+    var extra = customPrompt("Please select an option:", options);
+    if (parseInt(extra) == -1) {
+      return;
+    }
+    bowler.bowling_run += parseInt(extra);
+    bowler.bowling_ball += 1;
+    // batsman1.batting_run += parseInt(extra);
+    batsman1.batting_ball += 1;
+    bowler.economy = parseFloat((bowler.bowling_run / bowler.bowling_ball)) * 6;
+
+
+    var ball = parseInt(Cookies.get("ball"));
+    var o = Math.floor((ball + 1) / 6);
+    var currentball = (ball + 1) % 6;
+    Cookies.set("ball", ball + 1);
+    Cookies.set("bowler", JSON.stringify(bowler));
+
+    if (batting == 1) {
+      if (match) {
+        if (match.over[0] == null) {
+          match.over.push(0);
+        }
+        // console.log(match.over[0])
+        match.over[0] = o + currentball / 10;
+        // console.log(match.over[0])
+        if (match.score[0] == null) {
+          match.score.push(0);
+        }
+        match.commentary[0].push(
+          match.over[0] + " " +
+          batsman1.name + " to " + bowler.name + " Bye " + parseInt(extra)
+        );
+        match.score[0] += parseInt(extra);
+      }
+      // console.log('hi');
+    } else {
+      if (match) {
+        if (match.over[1] == null) {
+          match.over.push(0);
+        }
+        match.over[1] = o + currentball / 10;
+        if (match.score[1] == null) {
+          match.score.push(0);
+        }
+        match.score[1] += parseInt(extra);
+        match.commentary[1].push(
+          match.over[1] + " " +
+          batsman1.name + " to " + bowler.name + " Bye " + parseInt(extra)
+        );
+      }
+    }
+
+    Cookies.set("bowler", JSON.stringify(bowler));
+    Cookies.set("match", JSON.stringify(match));
+    Cookies.set("bastman1", JSON.stringify(batsman1));
+    if (parseInt(extra) == 1 || parseInt(extra) == 3) {
+      strike_change();
+    }
+    over_change();
+    settemp(temp + 1);
+    handleInningend();
+    backend_call();
+
+  };
+  const handleInningend = async (event) => {
 
     if (batting == 1) {
       if ((match.over[0]) == (parseFloat(match.total_over)) || match.wicket[0] == 10) {
+        alert('1st Inninge ended....');
+        setIsLoding(true);
+        match.commentary[0].push("Inninge Ended....");
+        const res = await axios.post("http://localhost:8082/admin/update_players",
+          { match },
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+            withCredentials: true,
+          }
+        )
+        localStorage.setItem('player1', JSON.stringify(res.data.player2));
+        localStorage.setItem('player2', JSON.stringify(res.data.player1));
+        setIsLoding(false);
+
         setbatting(2);
-        localStorage.setItem('player1', JSON.stringify(player2));
-        localStorage.setItem('player2', JSON.stringify(player1));
+
         setbatsman1(null);
         setbatsman2(null);
         Cookies.set('ball', 0);
@@ -381,20 +735,56 @@ function Scoring() {
       else {
         match.winner = "tie"
       }
+
+      alert('Winner: ' + match.winner);
+      Cookies.set("bowler", JSON.stringify(bowler));
+      Cookies.set("match", JSON.stringify(match));
+      setIsLoding(true);
+      match.islive = false;
+
+      backend_call();
+      try {
+        await axios
+          .post("http://localhost:8082/admin/save_player", match)
+          .then((response) => {
+            console.log("Data sent successfully:", response.data);
+          })
+          .catch((error) => {
+            console.error("Error sending data:", error);
+          });
+      } catch (e) {
+        console.error("Error sending data:", e);
+      }
       navigate('/Admin_home');
     }
   };
-  const Inningend = (event) => {
+  const Inningend = async (event) => {
 
     if (batting == 1) {
+      alert('1st Inninge ended....');
+
+      setIsLoding(true);
+      const res = await axios.post("http://localhost:8082/admin/update_players",
+        { match },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      )
+      console.log(res.player1);
+      console.log(res.player2);
+      localStorage.setItem('player1', JSON.stringify(res.data.player2));
+      localStorage.setItem('player2', JSON.stringify(res.data.player1));
+      setIsLoding(false);
+
       setbatting(2);
-      localStorage.setItem('player1', JSON.stringify(player2));
-      localStorage.setItem('player2', JSON.stringify(player1));
-      setbatting(2);
-      setisshow(0);
+
       setbatsman1(null);
       setbatsman2(null);
       Cookies.set('ball', 0);
+      setisshow(0);
     }
     else {
       if (match.score[0] > match.score[1]) {
@@ -406,6 +796,23 @@ function Scoring() {
       }
       else {
         match.winner = "tie"
+      }
+      alert('Winner: ' + match.winner);
+
+      setIsLoding(true);
+      match.islive = false;
+      backend_call();
+      try {
+        await axios
+          .post("http://localhost:8082/admin/save_player", match)
+          .then((response) => {
+            console.log("Data sent successfully:", response.data);
+          })
+          .catch((error) => {
+            console.error("Error sending data:", error);
+          });
+      } catch (e) {
+        console.error("Error sending data:", e);
       }
       navigate('/Admin_home');
     }
@@ -427,7 +834,7 @@ function Scoring() {
           </select>
         </>
       )}
-      {iswicket != 1 && isshow == 0 && (
+      {!isLoding && iswicket != 1 && isshow == 0 && (
         <>
           <select id="firstselect" onChange={handlebastmanselect1}>
             <option value="option1">Select a Striker</option>
@@ -465,7 +872,9 @@ function Scoring() {
           </select>
         </>
       )}
-      {iswicket != 1 && isshow == 2 && (
+      {isLoding ? (<div className="flex justify-center">
+        <TailSpin color="#00BFFF" height={50} width={50} />
+      </div>) : iswicket != 1 && isshow == 2 && (
         <>
           <div className="bg-gray-100 p-4 rounded-lg shadow-md">
             <div className="grid grid-cols-2 text-center mb-4 flex justify-between">
@@ -477,7 +886,7 @@ function Scoring() {
                 /
                 {match && match.wicket && match.wicket[0] != null
                   ? match.wicket[0]
-                  : 0}
+                  : 0}({match.over[0]}/{match.total_over})
               </h2>
               <h2 className="text-2xl font-semibold">
                 {team2.team_name}:{" "}
@@ -487,7 +896,7 @@ function Scoring() {
                 /
                 {match && match.wicket && match.wicket[1] != null
                   ? match.wicket[1]
-                  : 0}
+                  : 0}({match.over[1]}/{match.total_over})
               </h2>
             </div>
             <div className="grid grid-cols-2 gap-4">
@@ -540,7 +949,7 @@ function Scoring() {
                 {
                   <p>
                     Overs: {bowler.bowling_ball == null && 0}
-                    {bowler.bowling_ball != null && bowler.bowling_ball}
+                    {bowler.bowling_ball != null && (parseInt(bowler.bowling_ball / 6) + (parseFloat((bowler.bowling_ball % 6) / 10)))}
                   </p>
                 }
 

@@ -3,6 +3,7 @@ import axios from "axios";
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import Cookies from 'js-cookie';
+import { TailSpin } from 'react-loader-spinner';
 
 function Add_match() {
     const navigate = useNavigate();
@@ -124,7 +125,7 @@ function Add_match() {
                     withCredentials: true,
                 }
             )
-            console.log(response)
+
             const { team1, team2, player1, player2 } = response.data;
             localStorage.setItem('team1', JSON.stringify(team1));
             localStorage.setItem('team2', JSON.stringify(team2));
@@ -152,7 +153,9 @@ function Add_match() {
         <>
             {loading ? (
                 // Render a loading spinner while loading is true
-                <div className="loader">Loading...</div>
+                <div className="flex justify-center">
+                    <TailSpin color="#00BFFF" height={50} width={50} />
+                </div>
             ) : (
                 <div className="min-h-screen flex items-center justify-center bg-gray-100">
                     <div className="bg-white p-8 rounded shadow-md md:w-96 w-full">

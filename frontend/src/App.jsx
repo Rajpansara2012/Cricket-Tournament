@@ -11,6 +11,9 @@ import Add_match from "./components/Match_handling/Add_match";
 import Navbar from "./components/Navbar/Navbar";
 import Logout from "./components/Logout/Logout";
 import Scoring from "./components/Match_handling/Scoring";
+import TournamentList from "./components/View_match/TournamentList";
+import Add_Team from "./components/Add_Team/Add_Team";
+import Your_matches from "./components/Add_Team/Your_matches";
 function App() {
   const [usertype, setusertype] = useState('');
   useEffect(() => {
@@ -32,13 +35,13 @@ function App() {
       < Navbar usertype={usertype}> </Navbar>
       <Router>
         <Routes>
-          <Route path="/" element={<Login />}></Route>
+          <Route path="/" element={<Login setuser={setuser} />}></Route>
         </Routes>
         <Routes>
           <Route path="/Signup" element={<Signup></Signup>}></Route>
         </Routes>
         <Routes>
-          <Route path="/Login" element={<Login setuser={setuser}></Login>}></Route>
+          <Route path="/Login" element={<Login setuser={setuser} />}></Route>
         </Routes>
         <Routes>
           <Route path="/Logout" element={<Logout setuser={setuser}></Logout>}></Route>
@@ -56,7 +59,16 @@ function App() {
           <Route path="/Add_match" element={<Add_match />}></Route>
         </Routes>
         <Routes>
+          <Route path="/Add_Team" element={<Add_Team />}></Route>
+        </Routes>
+        <Routes>
+          <Route path="/Your_Matches" element={<Your_matches />}></Route>
+        </Routes>
+        <Routes>
           <Route path="/Scoring" element={<Scoring />}></Route >
+        </Routes>
+        <Routes>
+          <Route path="/View_Matches" element={<TournamentList />}></Route >
         </Routes>
       </Router>
     </>
