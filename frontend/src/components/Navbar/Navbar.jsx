@@ -9,7 +9,7 @@ function Navbar(props) {
     };
     return (
         <>
-            {props.usertype == 'admin' && <nav className="bg-white border-gray-200 dark:bg-gray-900">
+            {props.usertype == 'admin' && <nav className="bg-white border-gray-200 dark:bg-gray-900 sticky top-0">
                 <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
                     <a href="/Login" className="flex items-center">
                         <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">Cricket Tournament</span>
@@ -28,9 +28,9 @@ function Navbar(props) {
                     </button>
                     <div className={`w-full md:block md:w-auto ${isMenuOpen ? '' : 'hidden'}`} id="navbar-default">
                         <ul className="font-medium flex flex-col p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-8 md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
-                            {/* <li>
-                                <a href="/" className="block py-2 pl-3 pr-4 text-white bg-blue-700 rounded md:bg-transparent md:text-blue-700 md:p-0 dark:text-white md:dark:text-blue-500" aria-current="page">Home</a>
-                            </li> */}
+                            <li>
+                                <a href="/View_Matches" className="block py-2 pl-3 pr-4 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">View Matches</a>
+                            </li>
                             <li>
                                 <a href="/Add_Tournament" className="block py-2 pl-3 pr-4 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">Add Tournament</a>
                             </li>
@@ -45,7 +45,7 @@ function Navbar(props) {
                 </div>
             </nav>}
             {props.usertype == 'user' &&
-                <nav className="bg-white border-gray-200 dark:bg-gray-900">
+                <nav className="bg-white border-gray-200 dark:bg-gray-900 sticky top-0 ">
                     <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
                         <a href="/Login" className="flex items-center">
                             <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">Cricket Tournament</span>
@@ -64,15 +64,12 @@ function Navbar(props) {
                         </button>
                         <div className={`w-full md:block md:w-auto ${isMenuOpen ? '' : 'hidden'}`} id="navbar-default">
                             <ul className="font-medium flex flex-col p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-8 md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
-                                {/* <li>
-                                <a href="/" className="block py-2 pl-3 pr-4 text-white bg-blue-700 rounded md:bg-transparent md:text-blue-700 md:p-0 dark:text-white md:dark:text-blue-500" aria-current="page">Home</a>
-                            </li> */}
-                                {/* <li>
-                                    <a href="/Add_Tournament" className="block py-2 pl-3 pr-4 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">Add Tournament</a>
+                                <li>
+                                    <a href="/Your_Matches" className="block py-2 pl-3 pr-4 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">Your Matches</a>
                                 </li>
                                 <li>
-                                    <a href="/Add_Match" className="block py-2 pl-3 pr-4 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">Add Match</a>
-                                </li> */}
+                                    <a href="/Add_Team" className="block py-2 pl-3 pr-4 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">Add Team</a>
+                                </li>
                                 <li>
                                     <a href="/Logout" className="block py-2 pl-3 pr-4 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent">Logout</a>
                                 </li>
@@ -82,7 +79,7 @@ function Navbar(props) {
                 </nav>
             }
             {props.usertype == '' &&
-                <nav className="bg-white border-gray-200 dark:bg-gray-900">
+                <nav className="bg-white border-gray-200 dark:bg-gray-900 sticky top-0">
                     <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
                         <a href="/Login" className="flex items-center">
                             <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">Cricket Tournament</span>

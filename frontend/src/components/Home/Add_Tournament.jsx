@@ -8,12 +8,18 @@ function Add_Tournament() {
 
     useEffect(() => {
         const userfind = Cookies.get('token');
+        const usertype = Cookies.get('user_type');
         if (userfind === undefined) {
             navigate("/Login")
         }
+        else if(usertype != 'admin'){
+            navigate("/User_home");
+        }
+
     }, []);
     const [formData, setFormData] = useState({
         tournament_name: "",
+        location: "",
         capacity: 0
     });
     const handleChange = (event) => {
@@ -60,6 +66,17 @@ function Add_Tournament() {
                             onChange={handleChange}
                             className="w-full p-2 border rounded focus:ring focus:ring-blue-300"
                             placeholder="Tournament Name"
+                            required
+                        />
+                    </div>
+                    <div className="mb-4">
+                        <input
+                            type="text"
+                            name="location"
+                            value={formData.location}
+                            onChange={handleChange}
+                            className="w-full p-2 border rounded focus:ring focus:ring-blue-300"
+                            placeholder="Tournament Location"
                             required
                         />
                     </div>

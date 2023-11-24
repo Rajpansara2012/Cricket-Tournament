@@ -14,6 +14,7 @@ const match = new mongoose.Schema({
     winner: String,
     venue: String,
     total_over: Number,
+    islive: { type: Boolean, default: false },
     players1: { type: [], default: null },
     players2: { type: [], default: null },
     commentary: { type: [[String]], default: null }

@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { TailSpin } from 'react-loader-spinner';
 
 const Details = (props) => {
     const teamsid = props.teamsid;
     const [teams, setTeams] = useState([]);
-    const [loading, setLoading] = useState(true); // Add loading state
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchTeams = async () => {
@@ -20,23 +21,32 @@ const Details = (props) => {
                     }
                 );
                 setTeams(response.data.allteams);
-                setLoading(false); // Set loading to false after data is fetched
+                setLoading(false);
             } catch (error) {
                 console.log(error);
-                setLoading(false); // Set loading to false on error
+                setLoading(false);
             }
         };
         fetchTeams();
     }, []);
 
+    const handleClose = () => {
+        props.onClose();
+    };
+
     return (
-        <div>
+        <div className="p-4 bg-white rounded-lg shadow-lg relative">
             {loading ? (
-                <p>Loading...</p>
+                <div className="flex justify-center">
+                    <TailSpin color="#00BFFF" height={50} width={50} />
+                </div>
             ) : teams && teams.length > 0 ? (
-                teams.map((team) => (
-                    <p key={team.id}>{team.team_name}</p>
-                ))
+                <div>
+                    <h4>Teams:</h4>
+                    {teams.map((team) => (
+                        <h2 key={team.id}>{team.team_name}</h2>
+                    ))}
+                </div>
             ) : (
                 <p>No teams available</p>
             )}
