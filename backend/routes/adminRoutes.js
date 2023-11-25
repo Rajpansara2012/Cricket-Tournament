@@ -80,6 +80,15 @@ router.post('/add_match', isauthenticated, async (req, res) => {
                 toss_status,
                 winner: winner
             });
+            if ((toss == team_name2 && toss_status == "batting") || (toss == team_name1 && toss_status != "batting")) {
+                var temp = match.team_name[0];
+                match.team_name[0] = match.team_name[1];
+                match.team_name[1] = temp;
+                var temp2 = match.teamId[0];
+                match.teamId[0] = match.teamId[1];
+                match.teamId[1] = temp2;
+            }
+
             match.over[0] = 0;
             match.over[1] = 0;
             match.score[0] = 0;
@@ -115,14 +124,13 @@ router.post('/add_match', isauthenticated, async (req, res) => {
                 .status(200)
 
             res.cookie('match', JSON.stringify(match), { expires: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000) });
-            if (toss == team[0].team_name && toss_status == "batting") {
-
+            if ((toss == team_name1 && toss_status == "batting") || (toss == team_name2 && toss_status != "batting")) {
                 // console.log(player1.length);
                 // console.log(player2.length);
-                res.json({ message: 'match added successfully.', match, team1: team[0], team2: team[1], player1, player2 });
+                res.json({ message: 'match added successfully.', match, team1: team[0], team2: team[1], player1: player1, player2: player2 });
             }
             else {
-                res.json({ message: 'match added successfully.', match, team1: team[1], team2: team[0], player2, player1 });
+                res.json({ message: 'match added successfully.', match, team1: team[1], team2: team[0], player1: player2, player2: player1 });
 
             }
         }
@@ -272,18 +280,18 @@ router.post('/save_player', async (req, res) => {
             p2.save();
         }
         res
-        .cookie("bastman1", null, {
-            expires: new Date()
-        })
-        .cookie("bastman2", null, {
-            expires: new Date()
-        })
-        .cookie("bowler", null, {
-            expires: new Date()
-        }).cookie("match", null, {
-            expires: new Date()
-        })
-        .status(200)
+            .cookie("bastman1", null, {
+                expires: new Date()
+            })
+            .cookie("bastman2", null, {
+                expires: new Date()
+            })
+            .cookie("bowler", null, {
+                expires: new Date()
+            }).cookie("match", null, {
+                expires: new Date()
+            })
+            .status(200)
         res.json({ message: 'player Saved...' });
 
     } catch (e) {
