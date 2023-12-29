@@ -12,6 +12,17 @@ const player = new mongoose.Schema({
     bowling_ball: { type: Number, default: 0 },
     economy: { type: Number, default: 0 },
     wicket: { type: Number, default: 0 },
+    profile: {
+        run: { type: Number, default: 0 },
+        faced_ball: { type: Number, default: 0 },
+        strike_rate: { type: Number, default: 0 },
+        fours: { type: Number, default: 0 },
+        sixes: { type: Number, default: 0 },
+        bowling_run: { type: Number, default: 0 },
+        delivery_ball: { type: Number, default: 0 },
+        economy: { type: Number, default: 0 },
+        wicket: { type: Number, default: 0 },
+    }
 });
 
 module.exports = mongoose.model('player', player);

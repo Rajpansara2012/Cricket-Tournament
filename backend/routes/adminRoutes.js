@@ -15,7 +15,8 @@ router.post('/addtournament', isauthenticated, async (req, res) => {
         const tournament_name = req.body.tournament_name;
         const capacity = req.body.capacity;
         const location = req.body.location;
-        const tournament = new Tournament({ tournament_name, userId: req.userId, capacity, location });
+        const tournament_fee = req.body.tournament_fee;
+        const tournament = new Tournament({ tournament_name, userId: req.userId, capacity, location, tournament_fee });
         await tournament.save();
         res.json({ message: 'tournament added successfully.', tournament });
     }

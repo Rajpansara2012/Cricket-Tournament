@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from 'react';
 
 function Commentary({ match }) {
+    useEffect(() => {
+        setInterval(() => {
+
+        }, 2000);
+    }, []);
     if (!match || !match.commentary || match.commentary.length !== 2) {
         return (
             <div className="text-center mt-4">

@@ -5,6 +5,7 @@ const tournamentschema = new mongoose.Schema({
     userId: String,
     capacity: Number,
     location: String,
+    tournament_fee: Number,
     teams: [{ type: mongoose.Schema.Types.ObjectId, ref: 'team', default: null }]
 });
 

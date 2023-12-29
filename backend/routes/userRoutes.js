@@ -2,11 +2,13 @@ const express = require('express');
 const Tournament = require('../models/tournament');
 const Team = require('../models/team');
 const Player = require('../models/player');
+const User = require('../models/user');
 
 const { isauthenticated } = require('../middleware/auth');
 const match = require('../models/match');
 const router = express.Router();
-
+// const Razorpay = require('razorpay');
+// const razorpay = new Razorpay({ key_id:})
 router.post('/showall_tournament', isauthenticated, async (req, res) => {
     try {
         // const userId = req.session.userId;
@@ -92,7 +94,45 @@ router.post('/add_team', isauthenticated, async (req, res) => {
         tournament.capacity--;
         await tournament.save();
         await team.save();
+        // payment integration
+        // const amount = tournament.tournament_fee;
+        // const currency = 'INR';
+        // const user = await User.findById(tournament.userId);
+        // const option = {
+        //     amount,
+        //     currency,
+        //     notes: {
+        //         Tournamentorganizer: user.username.toString()
+        //     },
+        // };
+        // const order = await razorpay.orders.create(options);
+
         res.json({ message: 'team added successfully.', });
+    }
+    catch (error) {
+        console.log(error);
+        res.status(500).json({ error: 'An error occurred.' });
+    }
+});
+
+router.post('/fectch_players', isauthenticated, async (req, res) => {
+    try {
+        const teamId = req.body.teamId;
+        const team1 = await Team.findById(teamId[0]);
+        const team2 = await Team.findById(teamId[1]);
+        const playerId1 = team1.players;
+        const playerId2 = team2.players;
+        const players1 = [];
+        const players2 = [];
+
+        for (var i = 0; i < 11; i++) {
+            const p1 = await (Player.findById(playerId1[i]));
+            const p2 = await (Player.findById(playerId2[i]));
+            players1.push(p1);
+            players2.push(p2);
+        }
+        // console.log(players1, players2);
+        res.json({ players1, players2 });
     }
     catch (error) {
         console.log(error);

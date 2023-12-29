@@ -21,7 +21,8 @@
     "express-session": "^1.17.3",
     "mongodb": "^6.1.0",
     "mongoose": "^7.4.3",
-    "node-localstorage": "^3.0.5"
+    "node-localstorage": "^3.0.5",
+    "razorpay": "^2.9.2"
   },
   "devDependencies": {
     "nodemon": "^3.0.1"

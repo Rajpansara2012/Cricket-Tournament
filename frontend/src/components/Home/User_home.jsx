@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import Modal from 'react-modal';
 import MatchDetails from '../View_match/MatchDetails';
+import MatchDetail1 from '../View_match/MatchDetail1';
+
 import Commentary from '../View_match/Commentary';
 import { TailSpin } from 'react-loader-spinner';
 
@@ -52,7 +54,6 @@ function User_home() {
       }
     };
     setInterval(() => {
-
       fetchMatches();
       setIsLoding(false);
     }, 2000);
@@ -132,10 +133,11 @@ function User_home() {
               </div>
 
               {selectedOption === 'scoreboard' ? (
-                <MatchDetails match={selectedMatch} />
+                !selectedMatch.islive ? <MatchDetails match={selectedMatch} /> : <MatchDetail1 match={selectedMatch} />
               ) : (
                 <Commentary match={selectedMatch} />
               )}
+
             </div>
           </div>
         )}

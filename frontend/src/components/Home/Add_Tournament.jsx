@@ -12,7 +12,7 @@ function Add_Tournament() {
         if (userfind === undefined) {
             navigate("/Login")
         }
-        else if(usertype != 'admin'){
+        else if (usertype != 'admin') {
             navigate("/User_home");
         }
 
@@ -20,7 +20,8 @@ function Add_Tournament() {
     const [formData, setFormData] = useState({
         tournament_name: "",
         location: "",
-        capacity: 0
+        tournament_fee: null,
+        capacity: null
     });
     const handleChange = (event) => {
         const { name, value } = event.target;
@@ -77,6 +78,19 @@ function Add_Tournament() {
                             onChange={handleChange}
                             className="w-full p-2 border rounded focus:ring focus:ring-blue-300"
                             placeholder="Tournament Location"
+                            required
+                        />
+                    </div>
+                    <div className="mb-4">
+                        <input
+                            type="number"
+                            name="tournament_fee"
+                            value={formData.tournament_fee}
+                            onChange={handleChange}
+                            className="w-full p-2 border rounded focus:ring focus:ring-blue-300"
+                            placeholder="tournament_fee"
+                            min="1"
+                            step="1"
                             required
                         />
                     </div>

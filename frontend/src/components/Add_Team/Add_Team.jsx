@@ -107,6 +107,7 @@ function Add_Team() {
                     <div key={tournament._id} className="bg-white p-4 rounded-lg shadow-md cursor-pointer hover:shadow-xl" onClick={() => addTeamHandler(tournament)}>
                         <h3 className="text-lg font-semibold">{tournament.tournament_name}</h3>
                         <p>Available Slot: {tournament.capacity}</p>
+                        <p>Tournament fee: {tournament.tournament_fee != null && tournament.tournament_fee} {tournament.tournament_fee == null && 0}</p>
                         {tournament.capacity && (
                             <button onClick={() => addTeamHandler(tournament)}>
                                 Add Your Team
