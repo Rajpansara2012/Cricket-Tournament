@@ -257,26 +257,50 @@ router.post('/save_player', async (req, res) => {
         for (var i = 0; i < 11; i++) {
             const p1 = await (Player.findById(team1Obj.players[i]));
             const p2 = await (Player.findById(team2Obj.players[i]));
+
             p1.batting_status = "remaining";
+            p1.profile.run += p1.batting_run;
             p1.batting_run = null;
+            p1.profile.faced_ball += p1.batting_ball;
             p1.batting_ball = null;
             p1.strike_rate = null;
+            if (p1.profile.faced_ball != 0)
+                p1.profile.strike_rate = (p1.profile.run / p1.profile.faced_ball) * 100;
+            p1.profile.fours += p1.fours;
+            p1.profile.sixes += p1.sixes;
             p1.fours = null;
             p1.sixes = null;
+            p1.profile.delivery_ball += p1.bowling_ball;
             p1.bowling_ball = null;
+            p1.profile.bowling_run += p1.bowling_run;
             p1.bowling_run = null;
+            p1.profile.wicket += p1.wicket;
             p1.wicket = null;
+            if (p1.profile.delivery_ball != 0)
+                p1.profile.economy = p1.profile.bowling_run / p1.profile.delivery_ball;
             p1.economy = null;
             p1.save();
+
             p2.batting_status = "remaining";
+            p2.profile.run += p2.batting_run;
             p2.batting_run = null;
+            p2.profile.faced_ball += p2.batting_ball;
             p2.batting_ball = null;
             p2.strike_rate = null;
+            if (p2.profile.faced_ball != 0)
+                p2.profile.strike_rate = (p2.profile.run / p2.profile.faced_ball) * 100;
+            p2.profile.fours += p2.fours;
+            p2.profile.sixes += p2.sixes;
             p2.fours = null;
             p2.sixes = null;
+            p2.profile.delivery_ball += p2.bowling_ball;
             p2.bowling_ball = null;
+            p2.profile.bowling_run += p2.bowling_run;
             p2.bowling_run = null;
+            p2.profile.wicket += p2.wicket;
             p2.wicket = null;
+            if (p2.profile.delivery_ball != 0)
+                p2.profile.economy = p2.profile.bowling_run / p2.profile.delivery_ball;
             p2.economy = null;
             p2.save();
         }
@@ -299,6 +323,7 @@ router.post('/save_player', async (req, res) => {
         console.log(e.message);
     }
 });
+
 router.post('/matches', async (req, res) => {
     try {
         // console.log(req.body.tournament_id);

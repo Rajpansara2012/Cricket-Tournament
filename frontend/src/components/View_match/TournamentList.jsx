@@ -1,31 +1,40 @@
 import axios from "axios";
 import { useState, useEffect } from "react";
 import MatchList from './MatchList';
+import Cookies from "js-cookie";
+import { useNavigate, Link } from "react-router-dom";
 
 function TournamentList() {
     const [tournaments, setTournaments] = useState([]);
     const [selectedTournament, setSelectedTournament] = useState(null);
     const [isPopupOpen, setIsPopupOpen] = useState(false);
+    const navigate = useNavigate();
 
     useEffect(() => {
-        const fetchTournaments = async () => {
-            try {
-                const response = await axios.post(
-                    "http://localhost:8082/admin/showallt",
-                    {},
-                    {
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
-                        withCredentials: true,
-                    }
-                );
-                setTournaments(response.data.tournament);
-            } catch (error) {
-                console.log(error);
-            }
-        };
-        fetchTournaments();
+        const userfind = Cookies.get('token');
+        if (userfind === undefined) {
+            navigate("/Login");
+        }
+        else {
+            const fetchTournaments = async () => {
+                try {
+                    const response = await axios.post(
+                        "http://localhost:8082/admin/showallt",
+                        {},
+                        {
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                            withCredentials: true,
+                        }
+                    );
+                    setTournaments(response.data.tournament);
+                } catch (error) {
+                    console.log(error);
+                }
+            };
+            fetchTournaments();
+        }
     }, []);
 
     const handleTournamentClick = (tournament) => {

@@ -116,6 +116,7 @@ router.post('/add_team', isauthenticated, async (req, res) => {
 });
 
 router.post('/fectch_players', isauthenticated, async (req, res) => {
+    // console.log("hi");
     try {
         const teamId = req.body.teamId;
         const team1 = await Team.findById(teamId[0]);

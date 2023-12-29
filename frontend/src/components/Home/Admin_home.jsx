@@ -12,16 +12,16 @@ function Admin_home() {
     const navigate = useNavigate();
 
     useEffect(() => {
-            const userfind = Cookies.get('token');
-            const usertype = Cookies.get('user_type');
-            if (userfind === undefined) {
-                navigate("/Login")
-            }
-            else if(usertype != 'admin'){
-                navigate("/User_home");
-            }
-    
-        
+        const userfind = Cookies.get('token');
+        const usertype = Cookies.get('user_type');
+        if (userfind === undefined) {
+            navigate("/Login")
+        }
+        else if (usertype != 'admin') {
+            navigate("/User_home");
+        }
+
+
         const fetchTournaments = async () => {
             try {
                 const response = await axios.post(
@@ -55,11 +55,16 @@ function Admin_home() {
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {tournaments.map((tournament) => (
-                <div key={tournament._id} className="bg-white p-4 rounded-lg shadow-md cursor-pointer hover:shadow-xl" onClick={() => handleTournamentClick(tournament)}>
-                    <h3 className="text-lg font-semibold">{tournament.tournament_name}</h3>
-                    <p>Capacity: {tournament.capacity}</p>
-                    <p>Location: {tournament.location}</p>
-                </div>
+                <a
+                    key={tournament._id}
+                    href="#"
+                    className="block max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700"
+                    onClick={() => handleTournamentClick(tournament)}
+                >
+                    <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{tournament.tournament_name}</h5>
+                    <p className="font-normal text-gray-700 dark:text-gray-400">Capacity: {tournament.capacity}</p>
+                    <p className="font-normal text-gray-700 dark:text-gray-400">Location: {tournament.location}</p>
+                </a>
             ))}
             {isPopupOpen && (
                 <div className="fixed inset-0 flex items-center justify-center z-50">
