@@ -139,5 +139,17 @@ router.post('/fectch_players', isauthenticated, async (req, res) => {
         res.status(500).json({ error: 'An error occurred.' });
     }
 });
-
+router.post('/profile', isauthenticated, async (req, res) => {
+    try{
+        const user =await (User.findById(req.cookies.token));
+        // const profile = await (Player.findById(user._id));
+        const profile = await (Player.find({name:user.username}));
+        console.log(profile)
+         res.json({user:user ,profile:profile});
+    }
+    catch(error) {
+        console.log(error);
+        res.status(500).json({error : 'An error occurred.'});
+    }
+});
 module.exports = router;

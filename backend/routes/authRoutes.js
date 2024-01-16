@@ -26,6 +26,8 @@ router.post('/login', async (req, res) => {
             // console.log(req.session.userId);
             res.cookie('token', user._id, { expires: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000) });
             res.cookie('user_type', user.type, { expires: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000) });
+            res.cookie('username', user.username, { expires: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000) });
+
             res.json({
                 message: "loging succsesful",
                 user: user

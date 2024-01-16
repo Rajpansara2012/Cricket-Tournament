@@ -6,6 +6,7 @@ const localStorage = new LocalStorage('scratch.txt');
 const Match = require('../models/match');
 const Team = require('../models/team');
 const Player = require('../models/player');
+const Graph = require('../models/graph');
 const { isauthenticated } = require('../middleware/auth');
 
 const router = express.Router();
@@ -279,6 +280,26 @@ router.post('/save_player', async (req, res) => {
             p2.wicket = null;
             p2.economy = null;
             p2.save();
+        }
+        for (var i = 0; i < 11; i++) {
+            const p1 = await (Player.findById(team1Obj.players[i]));
+            const p2 = await (Player.findById(team2Obj.players[i]));
+            const graph = new Graph({
+                run : p1.batting_run,
+                strike_rate : p1.profile.strike_rate,
+                wicket : p1.wicket,
+                economy : p1.profile.economy,
+                player : p1._id
+            });
+            const graph1 = new Graph({
+                run : p2.batting_run,
+                strike_rate : p2.profile.strike_rate,
+                wicket : p2.wicket,
+                economy : p2.profile.economy,
+                player : p2._id
+            }); 
+            graph.save();
+            graph1.save();
         }
         res
             .cookie("bastman1", null, {
