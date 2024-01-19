@@ -131,7 +131,7 @@ function Navbar(props) {
                       >
                         <img
                           src="/path/to/your/profile-pic.jpg"
-                          alt="Profile"
+                          alt=""
                           className="w-8 h-8 mt-1 rounded-full border border-gray-300"
                         />
                       </div>

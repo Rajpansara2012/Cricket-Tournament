@@ -8,7 +8,7 @@ const Team = require('../models/team');
 const Player = require('../models/player');
 const Graph = require('../models/graph');
 const { isauthenticated } = require('../middleware/auth');
-
+const { ObjectId } = require('mongodb');
 const router = express.Router();
 
 router.post('/addtournament', isauthenticated, async (req, res) => {
@@ -100,7 +100,7 @@ router.post('/add_match', isauthenticated, async (req, res) => {
             match.commentary[0] = [];
             match.commentary[1] = [];
             match.islive = true;
-            match.save();
+            // match.save();
             const player1 = [];
             for (var i = 0; i < team[0].players.length; i++) {
                 player1.push(await Player.findById(team[0].players[i]));
@@ -129,9 +129,16 @@ router.post('/add_match', isauthenticated, async (req, res) => {
             if ((toss == team_name1 && toss_status == "batting") || (toss == team_name2 && toss_status != "batting")) {
                 // console.log(player1.length);
                 // console.log(player2.length);
+                match.players1 = player1;
+                match.players2 = player2;
+                match.save();
                 res.json({ message: 'match added successfully.', match, team1: team[0], team2: team[1], player1: player1, player2: player2 });
             }
             else {
+                match.players1 = player2;
+                match.players2 = player1;
+                match.save();
+                // res.cookie('match', JSON.stringify(match), { expires: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000) });
                 res.json({ message: 'match added successfully.', match, team1: team[1], team2: team[0], player1: player2, player2: player1 });
 
             }
@@ -211,21 +218,101 @@ router.post('/update_score', async (req, res) => {
                 console.error('Error updating object:', err);
             }
         }
-
         async function updateMatch(updatedObjectFromFrontend) {
             try {
-                const updatedObject = await Match.findByIdAndUpdate(
-                    updatedObjectFromFrontend._id,
-                    updatedObjectFromFrontend,
-                );
-                if (!updatedObject) {
-                    console.log('Object not found');
+                const matchId = updatedObjectFromFrontend._id;
+                const match = await Match.findById(matchId);
+
+                if (!match) {
+                    console.log('Match not found');
                     return;
                 }
+
+                // Update fields individually
+                match.team_name = updatedObjectFromFrontend.team_name;
+                match.teamId = updatedObjectFromFrontend.teamId;
+                match.userId = updatedObjectFromFrontend.userId;
+                match.tournamentId = updatedObjectFromFrontend.tournamentId;
+                match.score = updatedObjectFromFrontend.score;
+                match.wicket = updatedObjectFromFrontend.wicket;
+                match.over = updatedObjectFromFrontend.over;
+                match.toss = updatedObjectFromFrontend.toss;
+                match.toss_status = updatedObjectFromFrontend.toss_status;
+                match.winner = updatedObjectFromFrontend.winner;
+                match.venue = updatedObjectFromFrontend.venue;
+                match.total_over = updatedObjectFromFrontend.total_over;
+                match.islive = updatedObjectFromFrontend.islive;
+                match.commentary = updatedObjectFromFrontend.commentary;
+                const batsman1Id = receivedData.batsman1._id instanceof ObjectId
+                    ? receivedData.batsman1._id
+                    : new ObjectId(receivedData.batsman1._id);
+
+                const batsman2Id = receivedData.batsman2._id instanceof ObjectId
+                    ? receivedData.batsman2._id
+                    : new ObjectId(receivedData.batsman2._id);
+
+                const bowlerId = receivedData.bowler._id instanceof ObjectId
+                    ? receivedData.bowler._id
+                    : new ObjectId(receivedData.bowler._id);
+
+                // console.log(bowlerId);
+
+                // Update players1 array
+                match.players1.forEach((player, index) => {
+                    const playerId = player._id instanceof ObjectId ? player._id : new ObjectId(player._id);
+
+                    const isBatsman1 = batsman1Id.equals(playerId);
+                    const isBatsman2 = batsman2Id.equals(playerId);
+                    const isBowler = bowlerId.equals(playerId);
+
+                    if (isBatsman1 || isBatsman2 || isBowler) {
+                        // console.log("Match found");
+                        if (isBatsman1)
+                            match.players1[index] = receivedData.batsman1;
+                        else if (isBatsman2)
+                            match.players1[index] = receivedData.batsman2;
+                        else
+                            match.players1[index] = receivedData.bowler;
+                        // console.log(player);
+
+                    }
+                });
+
+                // Update players2 array
+                match.players2.forEach((player, index) => {
+                    const playerId = player._id instanceof ObjectId ? player._id : new ObjectId(player._id);
+
+                    const isBatsman1 = batsman1Id.equals(playerId);
+                    const isBatsman2 = batsman2Id.equals(playerId);
+                    const isBowler = bowlerId.equals(playerId);
+
+                    if (isBatsman1 || isBatsman2 || isBowler) {
+                        // console.log("Match found");
+                        // Assuming you want to update the player object itself
+                        if (isBatsman1)
+                            match.players2[index] = receivedData.batsman1;
+                        else if (isBatsman2)
+                            match.players2[index] = receivedData.batsman2;
+                        else
+                            match.players2[index] = receivedData.bowler;
+                        // console.log(player);
+                    }
+                });
+
+                // Save the updated match object
+                const updatedObject = await match.save();
+
+                // console.log('Object updated successfully:', updatedObject);
             } catch (err) {
                 console.error('Error updating object:', err);
             }
         }
+        if (receivedData.batsman1.batting_status == "remaing")
+            receivedData.batsman1.batting_status = "playing"
+        if (receivedData.batsman2.batting_status == "remaing")
+            receivedData.batsman2.batting_status = "playing"
+        // console.log(receivedData.batsman1.batting_status);
+        // console.log(receivedData.batsman2.batting_status);
         updateObject(receivedData.batsman1);
         updateObject(receivedData.batsman2);
         updateObject(receivedData.bowler);
@@ -248,59 +335,82 @@ router.post('/save_player', async (req, res) => {
         const t2Id = m.teamId[1];
         const team1Obj = await (Team.findById(t1Id));
         const team2Obj = await (Team.findById(t2Id));
-        for (var i = 0; i < 11; i++) {
-            const p1 = await (Player.findById(team1Obj.players[i]));
-            const p2 = await (Player.findById(team2Obj.players[i]));
-            m.players1.push(p1);
-            m.players2.push(p2);
-        }
-        m.save();
-        for (var i = 0; i < 11; i++) {
-            const p1 = await (Player.findById(team1Obj.players[i]));
-            const p2 = await (Player.findById(team2Obj.players[i]));
-            p1.batting_status = "remaining";
-            p1.batting_run = null;
-            p1.batting_ball = null;
-            p1.strike_rate = null;
-            p1.fours = null;
-            p1.sixes = null;
-            p1.bowling_ball = null;
-            p1.bowling_run = null;
-            p1.wicket = null;
-            p1.economy = null;
-            p1.save();
-            p2.batting_status = "remaining";
-            p2.batting_run = null;
-            p2.batting_ball = null;
-            p2.strike_rate = null;
-            p2.fours = null;
-            p2.sixes = null;
-            p2.bowling_ball = null;
-            p2.bowling_run = null;
-            p2.wicket = null;
-            p2.economy = null;
-            p2.save();
-        }
+        // for (var i = 0; i < 11; i++) {
+        //     const p1 = await (Player.findById(team1Obj.players[i]));
+        //     const p2 = await (Player.findById(team2Obj.players[i]));
+        //     m.players1.push(p1);
+        //     m.players2.push(p2);
+        // }
+        // m.save();
+        
         for (var i = 0; i < 11; i++) {
             const p1 = await (Player.findById(team1Obj.players[i]));
             const p2 = await (Player.findById(team2Obj.players[i]));
             const graph = new Graph({
                 run : p1.batting_run,
-                strike_rate : p1.profile.strike_rate,
+                strike_rate : (p1.profile.faced_ball+p1.batting_ball) != 0 ? ((p1.profile.run + p1.batting_run)/ (p1.profile.faced_ball + p1.batting_ball)) * 100 : 0,
                 wicket : p1.wicket,
-                economy : p1.profile.economy,
+                economy : (p1.profile.delivery_ball+p1.bowling_ball) !== 0 ? (p1.profile.bowling_run + p1.bowling_run) / ((p1.profile.delivery_ball + p1.bowling_ball) / 6):0,
+                status : p1.batting_status,
+                bowling_ball : p1.bowling_ball,
                 player : p1._id
             });
             const graph1 = new Graph({
                 run : p2.batting_run,
-                strike_rate : p2.profile.strike_rate,
+                strike_rate : p2.profile.faced_ball != 0 ? ((p2.profile.run + p2.batting_run)/ (p2.profile.faced_ball + p2.batting_ball)) * 100 : 0,
                 wicket : p2.wicket,
-                economy : p2.profile.economy,
+                economy : p2.profile.delivery_ball !== 0 ? (p2.profile.bowling_run + p2.bowling_run) / ((p2.profile.delivery_ball + p2.bowling_ball) / 6):0,
                 player : p2._id
-            }); 
+            });
             graph.save();
             graph1.save();
+            p1.batting_status = "remaing";
+            p1.profile.run += p1.batting_run;
+            p1.batting_run = 0;
+            p1.profile.faced_ball += p1.batting_ball;
+            p1.batting_ball = 0;
+            p1.strike_rate = 0;
+            if (p1.profile.faced_ball != 0)
+                p1.profile.strike_rate = (p1.profile.run / p1.profile.faced_ball) * 100;
+            p1.profile.fours += p1.fours;
+            p1.profile.sixes += p1.sixes;
+            p1.fours = 0;
+            p1.sixes = 0;
+            p1.profile.delivery_ball += p1.bowling_ball;
+            p1.bowling_ball = 0;
+            p1.profile.bowling_run += p1.bowling_run;
+            p1.bowling_run = 0;
+            p1.profile.wicket += p1.wicket;
+            p1.wicket = 0;
+            if (p1.profile.delivery_ball != 0)
+                p1.profile.economy = p1.profile.bowling_run / (p1.profile.delivery_ball / 6);
+            p1.economy = 0;
+            p1.save();
+
+            p2.batting_status = "remaing";
+            p2.profile.run += p2.batting_run;
+            p2.batting_run = 0;
+            p2.profile.faced_ball += p2.batting_ball;
+            p2.batting_ball = 0;
+            p2.strike_rate = 0;
+            if (p2.profile.faced_ball != 0)
+                p2.profile.strike_rate = (p2.profile.run / p2.profile.faced_ball) * 100;
+            p2.profile.fours += p2.fours;
+            p2.profile.sixes += p2.sixes;
+            p2.fours = 0;
+            p2.sixes = 0;
+            p2.profile.delivery_ball += p2.bowling_ball;
+            p2.bowling_ball = 0;
+            p2.profile.bowling_run += p2.bowling_run;
+            p2.bowling_run = 0;
+            p2.profile.wicket += p2.wicket;
+            p2.wicket = 0;
+            if (p2.profile.delivery_ball != 0)
+                p2.profile.economy = p2.profile.bowling_run / p2.profile.delivery_ball;
+            p2.economy = 0;
+            p2.save();
         }
+        
         res
             .cookie("bastman1", null, {
                 expires: new Date()
@@ -320,6 +430,7 @@ router.post('/save_player', async (req, res) => {
         console.log(e.message);
     }
 });
+
 router.post('/matches', async (req, res) => {
     try {
         // console.log(req.body.tournament_id);

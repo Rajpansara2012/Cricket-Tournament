@@ -21,35 +21,38 @@ function Scoring() {
   const [iswicket, setiswicket] = useState(0);
   const [isLoding, setIsLoding] = useState(false);
   useEffect(() => {
-    // const userfind = Cookies.get('token');
-    //     if (userfind === undefined) {
-    //         navigate("/Login");
-    //     }
-    const bat1 = Cookies.get("bastman1");
-    const bat2 = Cookies.get("bastman2");
-    const bowler = Cookies.get("bowler");
-    const match = Cookies.get("match");
-    const batting = Cookies.get("batting");
-    setbatting(parseInt(batting));
-    setmatch(JSON.parse(match));
-    console.log(team1.team_name);
-    console.log(team2.team_name);
-
-    if (bat1 != undefined) {
-      setbatsman1(JSON.parse(bat1));
+    const userfind = Cookies.get('token');
+    if (userfind === undefined) {
+      navigate("/Login");
     }
-    if (bat2 != undefined) {
-      setbatsman2(JSON.parse(bat2));
-    }
-    if (bowler != undefined) {
-      setbowler(JSON.parse(bowler));
-      //   Cookies.set('match', JSON.stringify(match));
-
+    else {
+      const bat1 = Cookies.get("bastman1");
+      const bat2 = Cookies.get("bastman2");
+      const bowler = Cookies.get("bowler");
+      const match = Cookies.get("match");
+      const batting = Cookies.get("batting");
+      setbatting(parseInt(batting));
       setmatch(JSON.parse(match));
+      console.log(team1.team_name);
+      console.log(team2.team_name);
+
+      if (bat1 != undefined) {
+        setbatsman1(JSON.parse(bat1));
+      }
+      if (bat2 != undefined) {
+        setbatsman2(JSON.parse(bat2));
+      }
+      if (bowler != undefined) {
+        setbowler(JSON.parse(bowler));
+        //   Cookies.set('match', JSON.stringify(match));
+
+        setmatch(JSON.parse(match));
+      }
+
+      if (bat1 != undefined && bat2 != undefined && bowler != undefined)
+        setisshow(2);
+      else if (bat1 != undefined && bat2 != undefined) setisshow(1);
     }
-    if (bat1 != undefined && bat2 != undefined && bowler != undefined)
-      setisshow(2);
-    else if (bat1 != undefined && bat2 != undefined) setisshow(1);
   }, []);
 
   const handlebastmanselect1 = (event) => {
@@ -496,7 +499,7 @@ function Scoring() {
     if (parseInt(extra) == 1 || parseInt(extra) == 3) {
       strike_change();
     }
-    if(Cookies.get("ball") != '0')
+    if (Cookies.get("ball") != '0')
       over_change();
     handleInningend();
     backend_call();
@@ -568,7 +571,7 @@ function Scoring() {
     if (parseInt(extra) == 1 || parseInt(extra) == 3) {
       strike_change();
     }
-    if(Cookies.get("ball") != '0')
+    if (Cookies.get("ball") != '0')
       over_change();
     settemp(temp + 1);
     handleInningend();
@@ -726,9 +729,9 @@ function Scoring() {
         )
         localStorage.setItem('player1', JSON.stringify(res.data.player2));
         localStorage.setItem('player2', JSON.stringify(res.data.player1));
-        
+
         setIsLoding(false);
-      Cookies.set("batting", 2);
+        Cookies.set("batting", 2);
 
         setbatting(2);
 
@@ -747,7 +750,7 @@ function Scoring() {
       else {
         match.winner = "tie"
       }
-      
+
       alert('Winner: ' + match.winner);
       Cookies.set("bowler", JSON.stringify(bowler));
       Cookies.set("match", JSON.stringify(match));
@@ -809,7 +812,7 @@ function Scoring() {
       else {
         match.winner = "tie"
       }
-      
+
       alert('Winner: ' + match.winner);
 
       setIsLoding(true);
@@ -831,14 +834,14 @@ function Scoring() {
     }
   }
   function commentrycustomPrompt() {
-      var selectedOption = prompt("Enter your comment:");
-      if (selectedOption) {
-        return selectedOption;
-      }
+    var selectedOption = prompt("Enter your comment:");
+    if (selectedOption) {
+      return selectedOption;
+    }
   }
   const handleCommentry = () => {
     const comment = commentrycustomPrompt();
-    if(batting == 1) {
+    if (batting == 1) {
       match.commentary[0].push(comment);
     }
     else {
@@ -849,76 +852,76 @@ function Scoring() {
   return (
     <div>
       {iswicket === 1 && (
-  <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center z-50">
-    <div className="bg-white p-4 rounded-lg shadow-lg">
-      <select
-        onChange={handelWicketBatsmen}
-        className="block w-full p-2 border border-gray-300 rounded focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-      >
-        <option value="option1">Select a Striker</option>
-        {player1 &&
-          player1
-            .filter((player) => player.batting_status !== "out" && player._id !== batsman2._id)
-            .map((player) => (
-              <option key={player._id} value={JSON.stringify(player)}>
-                {player.name} {player.type}
-              </option>
-            ))}
-      </select>
-    </div>
-  </div>
-)}
+        <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center z-50">
+          <div className="bg-white p-4 rounded-lg shadow-lg">
+            <select
+              onChange={handelWicketBatsmen}
+              className="block w-full p-2 border border-gray-300 rounded focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+            >
+              <option value="option1">Select a Striker</option>
+              {player1 &&
+                player1
+                  .filter((player) => player.batting_status !== "out" && player._id !== batsman2._id)
+                  .map((player) => (
+                    <option key={player._id} value={JSON.stringify(player)}>
+                      {player.name} {player.type}
+                    </option>
+                  ))}
+            </select>
+          </div>
+        </div>
+      )}
 
-{!isLoding && iswicket !== 1 && isshow === 0 && (
-  <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center  z-50">
-    <div className="bg-white p-4 rounded-lg shadow-lg flex flex-col items-center space-y-4">
-      <select
-        id="firstselect"
-        onChange={handlebastmanselect1}
-        className="p-2 border border-gray-300 rounded focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-      >
-        <option value="option1">Select a Striker</option>
-        {player1 &&
-          player1.map((player) => (
-            <option key={player._id} value={JSON.stringify(player)}>
-              {player.name} {player.type}
-            </option>
-          ))}
-      </select>
-      <select
-        id="secondselect"
-        onChange={handlebastmanselect2}
-        className="p-2 border border-gray-300 rounded focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-      >
-        <option value="option1">Select a Non striker</option>
-        {player1 &&
-          player1.map((player) => (
-            <option key={player._id} value={JSON.stringify(player)}>
-              {player.name} {player.type}
-            </option>
-          ))}
-      </select>
-    </div>
-  </div>
-)}
-{!isLoding && iswicket !== 1 && isshow === 1 && (
-  <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center  z-50">
-    <div className="bg-white p-4 rounded-lg shadow-lg">
-      <select
-        onChange={handlebowler}
-        className="block w-full p-2 border border-gray-300 rounded focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-      >
-        <option value="option1">Select a bowler</option>
-        {player2 &&
-          player2.map((player) => (
-            <option key={player._id} value={JSON.stringify(player)}>
-              {player.name} {player.type}
-            </option>
-          ))}
-      </select>
-    </div>
-  </div>
-)}
+      {!isLoding && iswicket !== 1 && isshow === 0 && (
+        <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center  z-50">
+          <div className="bg-white p-4 rounded-lg shadow-lg flex flex-col items-center space-y-4">
+            <select
+              id="firstselect"
+              onChange={handlebastmanselect1}
+              className="p-2 border border-gray-300 rounded focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+            >
+              <option value="option1">Select a Striker</option>
+              {player1 &&
+                player1.map((player) => (
+                  <option key={player._id} value={JSON.stringify(player)}>
+                    {player.name} {player.type}
+                  </option>
+                ))}
+            </select>
+            <select
+              id="secondselect"
+              onChange={handlebastmanselect2}
+              className="p-2 border border-gray-300 rounded focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+            >
+              <option value="option1">Select a Non striker</option>
+              {player1 &&
+                player1.map((player) => (
+                  <option key={player._id} value={JSON.stringify(player)}>
+                    {player.name} {player.type}
+                  </option>
+                ))}
+            </select>
+          </div>
+        </div>
+      )}
+      {!isLoding && iswicket !== 1 && isshow === 1 && (
+        <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center  z-50">
+          <div className="bg-white p-4 rounded-lg shadow-lg">
+            <select
+              onChange={handlebowler}
+              className="block w-full p-2 border border-gray-300 rounded focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+            >
+              <option value="option1">Select a bowler</option>
+              {player2 &&
+                player2.map((player) => (
+                  <option key={player._id} value={JSON.stringify(player)}>
+                    {player.name} {player.type}
+                  </option>
+                ))}
+            </select>
+          </div>
+        </div>
+      )}
 
       {isLoding ? (<div className="flex justify-center">
         <TailSpin color="#00BFFF" height={50} width={50} />

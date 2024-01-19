@@ -76,12 +76,46 @@ function User_home() {
                 <h2 className="text-lg font-semibold mb-2">
                   {match.team_name[0]} vs {match.team_name[1]}
                 </h2>
-                <p>
-                  {match.team_name[0]} Score: {match.score[0]}/{match.wicket[0]}({match.over[0]})
-                </p>
-                <p>
-                  {match.team_name[1]} Score: {match.score[1]}/{match.wicket[1]}({match.over[1]})
-                </p>
+                <div>
+                  <p>
+                    {match.team_name[0]} Score: {match.score[0]}/{match.wicket[0]}({match.over[0]})
+                  </p>
+                  {match.islive && match.commentary[1] && match.commentary[1].length === 0 && (
+                    <div>
+                      {match.players1
+                        .filter((player) => player.batting_status === "playing")
+                        .slice(0, 2)
+                        .map((filteredPlayer, playerIndex) => (
+                          <div key={playerIndex}>
+                            <p>
+                              {filteredPlayer.name} {filteredPlayer.batting_run}/{filteredPlayer.batting_ball}
+                            </p>
+                          </div>
+                        ))}
+                    </div>
+                  )}
+                </div>
+
+                <div>
+                  <p>
+                    {match.team_name[1]} Score: {match.score[1]}/{match.wicket[1]}({match.over[1]})
+                  </p>
+                  {match.islive && match.commentary[1] && match.commentary[1].length != 0 && (
+                    <div>
+                      {match.players2
+                        .filter((player) => player.batting_status === "playing")
+                        .slice(0, 2)
+                        .map((filteredPlayer, playerIndex) => (
+                          <div key={playerIndex}>
+                            <p>
+                              {filteredPlayer.name} {filteredPlayer.batting_run}/{filteredPlayer.batting_ball}
+                            </p>
+                          </div>
+                        ))}
+                    </div>
+                  )}
+                </div>
+
               </div>
               <div
                 className={`absolute top-5 right-4 px-2 py-1 rounded font-semibold ${match.islive ? 'bg-red-500 text-white' : 'bg-green-500 text-white'
@@ -91,6 +125,7 @@ function User_home() {
               </div>
             </div>
           ))}
+
         {isPopupOpen && selectedMatch && (
           <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-gray-800 bg-opacity-75">
             <div className="bg-white p-8 rounded shadow-md relative max-h-full overflow-y-auto">
@@ -133,7 +168,7 @@ function User_home() {
               </div>
 
               {selectedOption === 'scoreboard' ? (
-                !selectedMatch.islive ? <MatchDetails match={selectedMatch} /> : <MatchDetail1 match={selectedMatch} />
+                <MatchDetails match={selectedMatch} />
               ) : (
                 <Commentary match={selectedMatch} />
               )}

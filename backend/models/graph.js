@@ -4,6 +4,8 @@ const graph = new mongoose.Schema({
     strike_rate: { type: Number, default: 0 },
     economy: { type: Number, default: 0 },
     wicket: { type: Number, default: 0 },
+    status: {String},
+    bowling_ball : {type:Number},
     player: String
 });
 

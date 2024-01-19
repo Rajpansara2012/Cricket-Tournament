@@ -3,6 +3,7 @@ const Tournament = require('../models/tournament');
 const Team = require('../models/team');
 const Player = require('../models/player');
 const User = require('../models/user');
+const Graph = require('../models/graph');
 
 const { isauthenticated } = require('../middleware/auth');
 const match = require('../models/match');
@@ -116,6 +117,7 @@ router.post('/add_team', isauthenticated, async (req, res) => {
 });
 
 router.post('/fectch_players', isauthenticated, async (req, res) => {
+    // console.log("hi");
     try {
         const teamId = req.body.teamId;
         const team1 = await Team.findById(teamId[0]);
@@ -144,8 +146,26 @@ router.post('/profile', isauthenticated, async (req, res) => {
         const user =await (User.findById(req.cookies.token));
         // const profile = await (Player.findById(user._id));
         const profile = await (Player.find({name:user.username}));
-        console.log(profile)
-         res.json({user:user ,profile:profile});
+        // console.log(profile)
+
+        const obj_graph = await (Graph.find({player: profile[0]._id}))
+        console.log(obj_graph)
+        const run = [];
+        const strike_rate = [];
+        const wicket = [];
+        const economy = [];
+        for(var i = 0; i < obj_graph.length; i++) {
+            if(obj_graph[i].status != 'remaing') {
+                run.push(obj_graph[i].run);
+                strike_rate.push(obj_graph[i].strike_rate);
+            }
+            if(obj_graph[i].bowling_ball != 0) {
+                wicket.push(obj_graph[i].wicket);
+                economy.push(obj_graph[i].economy);
+            }
+
+        }
+         res.json({user:user ,profile:profile, graph_run:run, graph_strike_rate:strike_rate, graph_wicket:wicket, graph_economy:economy});
     }
     catch(error) {
         console.log(error);
