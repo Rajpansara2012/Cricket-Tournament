@@ -3,7 +3,8 @@ const Tournament = require('../models/tournament');
 const Team = require('../models/team');
 const Player = require('../models/player');
 const User = require('../models/user');
-
+const io = require('../app');
+const stripe = require("stripe")("sk_test_51OjLLdSDcDq2PzkiuB784Qt82nsky5v4q9NUZR2XlcufKGJMzezPSrkjl2UnYBA7v4ZXiFOLuxbTGEwKQOn0o8b500A2VtaGub");
 const { isauthenticated } = require('../middleware/auth');
 const match = require('../models/match');
 const router = express.Router();
@@ -27,20 +28,25 @@ router.post('/showall_tournament', isauthenticated, async (req, res) => {
         res.status(500).json({ error: 'An error occurred.' });
     }
 });
+
 router.post('/showall_matches', isauthenticated, async (req, res) => {
     try {
-        // const userId = req.session.userId;
         if (req.userId) {
-            const matches = await match.find();
-            res.json({ message: 'Match fecthecd ', matches });
-        }
-        else {
-            // console.log("not found")
-            res.status(300).json({ message: 'first login' });
-        }
+            // Find matches with islive: true
+            const liveMatches = await match.find({ islive: true });
 
-    }
-    catch (error) {
+            // Find matches with islive: false
+            const completedMatches = await match.find({ islive: false });
+
+            res.json({
+                message: 'Matches fetched successfully',
+                liveMatches,
+                completedMatches,
+            });
+        } else {
+            res.status(300).json({ message: 'First login' });
+        }
+    } catch (error) {
         console.log(error);
         res.status(500).json({ error: 'An error occurred.' });
     }
@@ -73,8 +79,39 @@ router.post('/user_matches', isauthenticated, async (req, res) => {
         res.status(500).json({ error: 'An error occurred.' });
     }
 });
+
+router.post('/handel_payment', isauthenticated, async (req, res) => {
+    const tournament_name = req.body.tournament_name;
+    const tournament = await Tournament.findOne({ tournament_name });
+    const team_name = req.body.team_name;
+    const userId = req.userId;
+    const players_obj = req.body.players;
+    // console.log(tournament_name);
+    const lineitems = [{
+        price_data: {
+            currency: "inr",
+            product_data: {
+                name: tournament_name
+            },
+            unit_amount: tournament.tournament_fee * 100
+        },
+        quantity: 1
+    }];
+
+    const session = await stripe.checkout.sessions.create({
+        payment_method_types: ["card"],
+        line_items: lineitems,
+        mode: "payment",
+        success_url: "http://localhost:5173/Add_Team",
+        cancel_url: "http://localhost:5173/Add_Team",
+    });
+    // console.log("hi");
+    res.json({ id: session.id });
+});
+
 router.post('/add_team', isauthenticated, async (req, res) => {
     try {
+        // console.log("add team");
         const tournament_name = req.body.tournament_name;
         const tournament = await Tournament.findOne({ tournament_name });
         const team_name = req.body.team_name;

@@ -3,10 +3,15 @@ import Cookies from "js-cookie";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import { TailSpin } from "react-loader-spinner";
+import _ from 'lodash';
+import io from 'socket.io-client';
 
 function Scoring() {
-  const navigate = useNavigate();
+  // const socket = io('http://localhost:8082', { withCredentials: true });
 
+  const navigate = useNavigate();
+  const [undo, setUndo] = useState([]);
+  const [redo, setRedo] = useState([]);
   const team1 = JSON.parse(localStorage.getItem("team1"));
   const team2 = JSON.parse(localStorage.getItem("team2"));
   const player1 = JSON.parse(localStorage.getItem("player1"));
@@ -202,7 +207,6 @@ function Scoring() {
     batsman1.batting_run += value;
     batsman1.batting_ball += 1;
     var ball = parseInt(Cookies.get("ball"));
-
     batsman1.strike_rate = (batsman1.batting_run / batsman1.batting_ball) * 100;
     if ((value == 1 || value == 3) && (ball + 1) % 6 != 0) {
       console.log("before strike change call");
@@ -215,12 +219,20 @@ function Scoring() {
       } else {
         batsman1.fours += 1;
       }
+      Cookies.set("bastman1", JSON.stringify(batsman1));
+      Cookies.set("bastman2", JSON.stringify(batsman2));
     } else if (value == 6) {
       if (batsman1.six == null) {
         batsman1.sixes = 1;
       } else {
         batsman1.sixes += 1;
       }
+      Cookies.set("bastman1", JSON.stringify(batsman1));
+      Cookies.set("bastman2", JSON.stringify(batsman2));
+    }
+    else if (value == 2) {
+      Cookies.set("bastman1", JSON.stringify(batsman1));
+      Cookies.set("bastman2", JSON.stringify(batsman2));
     }
     bowler.bowling_run += value;
     bowler.bowling_ball += 1;
@@ -270,6 +282,7 @@ function Scoring() {
     score(0);
     backend_call();
     over_change();
+
   };
 
   const handleOne = async (event) => {
@@ -315,6 +328,9 @@ function Scoring() {
     backend_call();
 
     over_change();
+    Cookies.set("bastman1", JSON.stringify(batsman1));
+    Cookies.set("bastman2", JSON.stringify(batsman2));
+    Cookies.set("bowler", JSON.stringify(bowler));
   };
 
   const handleThree = (event) => {
@@ -711,6 +727,7 @@ function Scoring() {
     backend_call();
 
   };
+
   const handleInningend = async (event) => {
 
     if (batting == 1) {
@@ -729,7 +746,8 @@ function Scoring() {
         )
         localStorage.setItem('player1', JSON.stringify(res.data.player2));
         localStorage.setItem('player2', JSON.stringify(res.data.player1));
-
+        setRedo([]);
+        setUndo([]);
         setIsLoding(false);
         Cookies.set("batting", 2);
 
@@ -770,9 +788,30 @@ function Scoring() {
       } catch (e) {
         console.error("Error sending data:", e);
       }
+      // socket.emit({ match: match });
       navigate('/Admin_home');
     }
+
+    const newUndo = {
+      match: JSON.parse(Cookies.get("match")),
+      batsman1: _.cloneDeep(JSON.parse(Cookies.get("bastman1"))),
+      batsman2: _.cloneDeep(JSON.parse(Cookies.get("bastman2"))),
+      bowler: _.cloneDeep(JSON.parse(Cookies.get("bowler"))),
+      isshow: isshow,
+      iswicket: iswicket,
+      ball: parseInt(Cookies.get("ball")),
+    };
+
+    console.log("Before setUndo:", undo);
+
+    setUndo([...undo, newUndo]);
+    setRedo([]);
+    console.log("After setUndo:", undo);
+
+
   };
+  console.log("iiiundo")
+  console.log(undo);
   const Inningend = async (event) => {
 
     if (batting == 1) {
@@ -849,6 +888,78 @@ function Scoring() {
     }
     backend_call();
   }
+  const handelUndo = async (event) => {
+    const lastElement = undo[undo.length - 2];
+    if (!lastElement) {
+      return; // No elements in undo, nothing to undo
+    }
+    setRedo(prevRedo => [...prevRedo, undo[undo.length - 1]]);
+    // Set the previous values to Schedule and Loads
+    setmatch(lastElement.match);
+    setbatsman1(lastElement.batsman1);
+    setbatsman2(lastElement.batsman2);
+    setbowler(lastElement.bowler);
+
+    setisshow(lastElement.isshow);
+    setiswicket(lastElement.iswicket);
+    Cookies.set("ball", lastElement.ball);
+    // Remove the last element from undo
+    const updatedUndo = undo.slice(0, undo.length - 1);
+    setUndo(updatedUndo);
+
+    // Perform the backend call or other necessary actions
+    try {
+      const res = await axios
+        .post("http://localhost:8082/admin/update_score", lastElement)
+        .then((response) => {
+          console.log("Data sent successfully:", response.data);
+        })
+        .catch((error) => {
+          console.error("Error sending data:", error);
+        });
+    } catch (e) {
+      console.error("Error sending data:", e);
+    }
+
+  }
+  const handleRedo = async () => {
+    const lastElement = redo[redo.length - 1];
+    if (!lastElement) {
+      return; // No elements in redo, nothing to redo
+    }
+
+    // Set the values from redo to Schedule and Loads
+    setmatch(lastElement.match);
+    setbatsman1(lastElement.batsman1);
+    setbatsman2(lastElement.batsman2);
+    setbowler(lastElement.bowler);
+
+    setisshow(lastElement.isshow);
+    setiswicket(lastElement.iswicket);
+    Cookies.set("ball", lastElement.ball);
+
+    // Move the last element from redo to undo
+    setUndo(prevUndo => [...prevUndo, lastElement]);
+
+    // Remove the last element from redo
+    setRedo(prevRedo => prevRedo.slice(0, -1));
+
+    // Perform the backend call or other necessary actions
+    try {
+      const res = await axios
+        .post("http://localhost:8082/admin/update_score", lastElement)
+        .then((response) => {
+          console.log("Data sent successfully:", response.data);
+        })
+        .catch((error) => {
+          console.error("Error sending data:", error);
+        });
+    } catch (e) {
+      console.error("Error sending data:", e);
+    }
+  };
+  console.log(redo);
+  console.log(match);
   return (
     <div>
       {iswicket === 1 && (
@@ -861,10 +972,10 @@ function Scoring() {
               <option value="option1">Select a Striker</option>
               {player1 &&
                 player1
-                  .filter((player) => player.batting_status !== "out" && player._id !== batsman2._id)
+                  .filter((player) => player.batting_status !== "out" && player._id !== batsman2._id && player._id !== batsman1._id)
                   .map((player) => (
                     <option key={player._id} value={JSON.stringify(player)}>
-                      {player.name} {player.type}
+                      {player.name} ({player.type})
                     </option>
                   ))}
             </select>
@@ -884,7 +995,7 @@ function Scoring() {
               {player1 &&
                 player1.map((player) => (
                   <option key={player._id} value={JSON.stringify(player)}>
-                    {player.name} {player.type}
+                    {player.name} ({player.type})
                   </option>
                 ))}
             </select>
@@ -897,7 +1008,7 @@ function Scoring() {
               {player1 &&
                 player1.map((player) => (
                   <option key={player._id} value={JSON.stringify(player)}>
-                    {player.name} {player.type}
+                    {player.name} ({player.type})
                   </option>
                 ))}
             </select>
@@ -915,7 +1026,7 @@ function Scoring() {
               {player2 &&
                 player2.map((player) => (
                   <option key={player._id} value={JSON.stringify(player)}>
-                    {player.name} {player.type}
+                    {player.name} ({player.type})
                   </option>
                 ))}
             </select>
@@ -1115,6 +1226,20 @@ function Scoring() {
                   onClick={handleCommentry}
                 >
                   Commentry
+                </button>
+                <button
+                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                  type="button"
+                  onClick={handelUndo}
+                >
+                  Undo
+                </button>
+                <button
+                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                  type="button"
+                  onClick={handleRedo}
+                >
+                  Redo
                 </button>
               </div>
             </form>

@@ -14,6 +14,23 @@ function Login(props) {
     useEffect(() => {
         const userfind = Cookies.get('token');
         const usertype = Cookies.get('user_type');
+        // async function fetchData() {
+        //     try {
+        //         const response = await axios.post('http://localhost:5000/predict', {
+        //             runs_left: 200,
+        //             balls_left: 100,
+        //             wickets_left: 4,
+        //             total_runs_x: 208,
+        //             cur_run_rate: 5.0,
+        //             req_run_rate: 1
+        //         });
+        //         console.log(response.data);
+
+        //     } catch (error) {
+        //         console.error('Error:', error);
+        //     }
+        // }
+        // fetchData();
         if (userfind !== undefined && usertype == 'admin') {
             navigate("/Admin_home");
         }

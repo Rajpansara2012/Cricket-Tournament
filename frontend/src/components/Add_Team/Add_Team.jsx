@@ -5,8 +5,10 @@ import Cookies from 'js-cookie';
 import Modal from 'react-modal';
 import { TailSpin } from 'react-loader-spinner';
 Modal.setAppElement('#root'); // Set the root app element for accessibility
+import { loadStripe } from '@stripe/stripe-js';
 
 function Add_Team() {
+
     const navigate = useNavigate();
     const [tournaments, setTournaments] = useState([]);
     const [selectedTournament, setSelectedTournament] = useState();
@@ -30,13 +32,14 @@ function Add_Team() {
     };
 
     const handleSubmit = async (event) => {
-        event.preventDefault();
         formData.tournament_name = selectedTournament.tournament_name;
+        event.preventDefault();
+        const stripe = await loadStripe('pk_test_51OjLLdSDcDq2Pzki8uOEXTrDGhQRrUWpt2GcIuj8vTq1SnJcJBoO8ZLXkOZyHMP5GBP9EN0DANJFsOQoZWH50WZE00UJlEjwJy');
         setLoading(true);
 
         try {
-            await axios.post(
-                "http://localhost:8082/user/add_team",
+            const response = await axios.post(
+                "http://localhost:8082/user/handel_payment",
                 formData,
                 {
                     headers: {
@@ -45,9 +48,38 @@ function Add_Team() {
                     withCredentials: true,
                 }
             );
+            const id = response.data.id;
+            console.log("id " + id);
+            const result = stripe.redirectToCheckout({
+                sessionId: id
+            })
+            console.log(result);
+            if (await result.error) {
+                console.log("payment error");
+            }
+            else {
+                try {
+                    // console.log("add_team");
+                    await axios.post(
+                        "http://localhost:8082/user/add_team",
+                        formData,
+                        {
+                            headers: {
+                                "Content-Type": "application/json",
+                            },
+                            withCredentials: true,
+                        }
+                    );
+
+                } catch (error) {
+                    console.log(error);
+                }
+            }
         } catch (error) {
             console.log(error);
         }
+
+
 
         setFormData({ tournament_name: "", team_name: "", players: Array(11).fill({ player_name: "", player_type: "" }) });
         setIsShow(false);

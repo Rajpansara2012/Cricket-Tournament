@@ -8,7 +8,9 @@ const Team = require('../models/team');
 const Player = require('../models/player');
 const { isauthenticated } = require('../middleware/auth');
 const { ObjectId } = require('mongodb');
+const match = require('../models/match');
 const router = express.Router();
+const io = require('../app');
 
 router.post('/addtournament', isauthenticated, async (req, res) => {
     try {
@@ -219,6 +221,7 @@ router.post('/update_score', async (req, res) => {
         }
         async function updateMatch(updatedObjectFromFrontend) {
             try {
+
                 const matchId = updatedObjectFromFrontend._id;
                 const match = await Match.findById(matchId);
 
@@ -300,7 +303,9 @@ router.post('/update_score', async (req, res) => {
 
                 // Save the updated match object
                 const updatedObject = await match.save();
+                console.log('Before emitting updateScore event');
 
+                io.emit('liveUpdate', updatedObject);
                 // console.log('Object updated successfully:', updatedObject);
             } catch (err) {
                 console.error('Error updating object:', err);
@@ -329,6 +334,7 @@ router.post('/save_player', async (req, res) => {
         const receivedData = req.body;
         const matchObj = await Match.findById(receivedData._id);
         const m = matchObj;
+        io.emit('liveUpdate', m);
         // console.log(m.winner)
         const t1Id = m.teamId[0];
         const t2Id = m.teamId[1];
