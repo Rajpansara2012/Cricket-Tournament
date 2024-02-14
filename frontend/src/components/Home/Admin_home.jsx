@@ -1,9 +1,8 @@
+import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useState, useEffect } from "react";
 import Details from "./Details";
 import Cookies from 'js-cookie';
 import { useNavigate } from "react-router-dom";
-
 
 function Admin_home() {
     const [tournaments, setTournaments] = useState([]);
@@ -40,7 +39,7 @@ function Admin_home() {
             }
         };
         fetchTournaments();
-    }, []);
+    }, [navigate]);
 
     const handleTournamentClick = (tournament) => {
         setSelectedTournament(tournament);

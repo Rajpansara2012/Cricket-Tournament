@@ -3,8 +3,12 @@ const Tournament = require('../models/tournament');
 const Team = require('../models/team');
 const Player = require('../models/player');
 const User = require('../models/user');
+
 const io = require('../app');
 const stripe = require("stripe")("sk_test_51OjLLdSDcDq2PzkiuB784Qt82nsky5v4q9NUZR2XlcufKGJMzezPSrkjl2UnYBA7v4ZXiFOLuxbTGEwKQOn0o8b500A2VtaGub");
+
+const Graph = require('../models/graph');
+
 const { isauthenticated } = require('../middleware/auth');
 const match = require('../models/match');
 const router = express.Router();
@@ -177,5 +181,35 @@ router.post('/fectch_players', isauthenticated, async (req, res) => {
         res.status(500).json({ error: 'An error occurred.' });
     }
 });
+router.post('/profile', isauthenticated, async (req, res) => {
+    try {
+        const user = await (User.findById(req.cookies.token));
+        // const profile = await (Player.findById(user._id));
+        const profile = await (Player.find({ name: user.username }));
+        // console.log(profile)
 
+        const obj_graph = await (Graph.find({ player: profile[0]._id }))
+        console.log(obj_graph)
+        const run = [];
+        const strike_rate = [];
+        const wicket = [];
+        const economy = [];
+        for (var i = 0; i < obj_graph.length; i++) {
+            if (obj_graph[i].status != 'remaing') {
+                run.push(obj_graph[i].run);
+                strike_rate.push(obj_graph[i].strike_rate);
+            }
+            if (obj_graph[i].bowling_ball != 0) {
+                wicket.push(obj_graph[i].wicket);
+                economy.push(obj_graph[i].economy);
+            }
+
+        }
+        res.json({ user: user, profile: profile, graph_run: run, graph_strike_rate: strike_rate, graph_wicket: wicket, graph_economy: economy });
+    }
+    catch (error) {
+        console.log(error);
+        res.status(500).json({ error: 'An error occurred.' });
+    }
+});
 module.exports = router;

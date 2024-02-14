@@ -6,6 +6,7 @@ const localStorage = new LocalStorage('scratch.txt');
 const Match = require('../models/match');
 const Team = require('../models/team');
 const Player = require('../models/player');
+const Graph = require('../models/graph');
 const { isauthenticated } = require('../middleware/auth');
 const { ObjectId } = require('mongodb');
 const match = require('../models/match');
@@ -347,10 +348,28 @@ router.post('/save_player', async (req, res) => {
         //     m.players2.push(p2);
         // }
         // m.save();
+        
         for (var i = 0; i < 11; i++) {
             const p1 = await (Player.findById(team1Obj.players[i]));
             const p2 = await (Player.findById(team2Obj.players[i]));
-
+            const graph = new Graph({
+                run : p1.batting_run,
+                strike_rate : (p1.profile.faced_ball+p1.batting_ball) != 0 ? ((p1.profile.run + p1.batting_run)/ (p1.profile.faced_ball + p1.batting_ball)) * 100 : 0,
+                wicket : p1.wicket,
+                economy : (p1.profile.delivery_ball+p1.bowling_ball) !== 0 ? (p1.profile.bowling_run + p1.bowling_run) / ((p1.profile.delivery_ball + p1.bowling_ball) / 6):0,
+                status : p1.batting_status,
+                bowling_ball : p1.bowling_ball,
+                player : p1._id
+            });
+            const graph1 = new Graph({
+                run : p2.batting_run,
+                strike_rate : p2.profile.faced_ball != 0 ? ((p2.profile.run + p2.batting_run)/ (p2.profile.faced_ball + p2.batting_ball)) * 100 : 0,
+                wicket : p2.wicket,
+                economy : p2.profile.delivery_ball !== 0 ? (p2.profile.bowling_run + p2.bowling_run) / ((p2.profile.delivery_ball + p2.bowling_ball) / 6):0,
+                player : p2._id
+            });
+            graph.save();
+            graph1.save();
             p1.batting_status = "remaing";
             p1.profile.run += p1.batting_run;
             p1.batting_run = 0;
@@ -397,6 +416,7 @@ router.post('/save_player', async (req, res) => {
             p2.economy = 0;
             p2.save();
         }
+        
         res
             .cookie("bastman1", null, {
                 expires: new Date()

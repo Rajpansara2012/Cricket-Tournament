@@ -14,6 +14,8 @@ import Scoring from "./components/Match_handling/Scoring";
 import TournamentList from "./components/View_match/TournamentList";
 import Add_Team from "./components/Add_Team/Add_Team";
 import Your_matches from "./components/Add_Team/Your_matches";
+import Profile from "./components/Player_profile/Profile";
+
 function App() {
   const [usertype, setusertype] = useState('');
   useEffect(() => {
@@ -32,7 +34,7 @@ function App() {
   console.log(usertype)
   return (
     <>
-      < Navbar usertype={usertype}> </Navbar>
+      < Navbar usertype={usertype} username = {Cookies.get('username')}> </Navbar>
       <Router>
         <Routes>
           <Route path="/" element={<Login setuser={setuser} />}></Route>
@@ -69,6 +71,9 @@ function App() {
         </Routes>
         <Routes>
           <Route path="/View_Matches" element={<TournamentList />}></Route >
+        </Routes>
+        <Routes>
+          <Route path="/Profile" element={<Profile />}></Route >
         </Routes>
       </Router>
     </>
