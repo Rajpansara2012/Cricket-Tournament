@@ -2,10 +2,12 @@ import React, { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import "./Navbar.css";
 
+
 function Navbar(props) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [username, setUsername] = useState("");
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
+
 
   useEffect(() => {
     // Fetch the username from cookies and update the state
@@ -13,21 +15,25 @@ function Navbar(props) {
     setUsername(storedUsername || "");
   }, []);
 
+
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
     setShowProfileDropdown(false); // Close profile dropdown when menu is toggled
   };
+
 
   const toggleProfileDropdown = () => {
     setShowProfileDropdown(!showProfileDropdown);
     setIsMenuOpen(false); // Close the menu when the profile dropdown is toggled
   };
 
+
   const handleLogout = () => {
     // Add logic to handle logout (e.g., clear cookies, redirect, etc.)
     // For now, let's just reload the page
     window.location.reload();
   };
+
 
   return (
     <nav className="bg-white border-gray-200 dark:bg-gray-900 sticky top-0 z-50 h-16">
@@ -37,6 +43,7 @@ function Navbar(props) {
             Cricket Tournament
           </span>
         </a>
+
 
         <button
           type="button"
@@ -62,6 +69,7 @@ function Navbar(props) {
             />
           </svg>
         </button>
+
 
         <div
           className={`w-full md:block md:w-auto ${isMenuOpen ? "" : "hidden"}`}
@@ -130,12 +138,13 @@ function Navbar(props) {
                         onClick={toggleProfileDropdown}
                       >
                         <img
-                          src="/path/to/your/profile-pic.jpg"
+                          src={Cookies.get('profile_img')}
                           alt=""
                           className="w-8 h-8 mt-1 rounded-full border border-gray-300"
                         />
                       </div>
                     )}
+
 
                     {showProfileDropdown && (
                       <div className="absolute right-0 mt-2 bg-white border border-gray-200 dark:bg-gray-800 dark:border-gray-700 rounded-lg shadow-md">
@@ -169,5 +178,6 @@ function Navbar(props) {
     </nav>
   );
 }
+
 
 export default Navbar;
