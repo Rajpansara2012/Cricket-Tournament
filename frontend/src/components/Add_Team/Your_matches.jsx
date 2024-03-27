@@ -42,7 +42,7 @@ function Your_matches() {
                 setIsLoding(false); // Set isLoding to false once the API call is completed
             }
         };
-        
+
         fetchTournaments();
     }, [navigate]);
 
@@ -77,11 +77,11 @@ function Your_matches() {
             )}
 
             {isPopupOpen && selectedMatch && (
-                <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-gray-800 bg-opacity-75">
+                <div className="fixed mt-10 left-0 w-full h-full flex items-center justify-center bg-gray-800 bg-opacity-75">
                     <div className="bg-white p-8 rounded shadow-md relative max-h-full overflow-y-auto">
                         <button
                             onClick={() => setPopupOpen(false)}
-                            className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 cursor-pointer"
+                            className="absolute top right-4 text-gray-500 hover:text-gray-800 cursor-pointer"
                         >
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"

@@ -1,3 +1,24 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Add these Tailwind CSS classes to your global styles or specific component styles */
+/* Add these Tailwind CSS classes to your global styles or specific component styles */
+/* Ensure the modal is scrollable */
+.modal {
+    /* Remove max-height property */
+    overflow-y: auto;
+    /* Add overflow-y property */
+}
+
+/* Ensure the overlay is positioned correctly */
+.modal-overlay {
+    z-index: 50;
+}
+
+/* Ensure the modal content is scrollable if it exceeds the height */
+.modal-content {
+    /* Remove max-height property */
+    overflow-y: auto;
+    /* Add overflow-y property */
+}

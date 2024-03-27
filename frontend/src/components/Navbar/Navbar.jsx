@@ -7,11 +7,11 @@ function Navbar(props) {
   const [username, setUsername] = useState("");
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
 
-  useEffect(() => {
-    // Fetch the username from cookies and update the state
-    const storedUsername = Cookies.get("username");
-    setUsername(storedUsername || "");
-  }, []);
+  // useEffect(() => {
+  //   // Fetch the username from cookies and update the state
+  //   const storedUsername = Cookies.get("username");
+  //   setUsername(storedUsername );
+  // }, []);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -30,12 +30,10 @@ function Navbar(props) {
   };
 
   return (
-    <nav className="bg-white border-gray-200 dark:bg-gray-900 sticky top-0 z-50 h-16">
-      <div className="max-w-screen-xl flex items-center justify-between mx-auto p-2 md:p-4">
+    <nav className="bg-gradient-to-r from-zinc-900 via-gray-700 to-gray-700 border-gray-200 dark:bg-gray-900 sticky top-0 z-50 h-16">
+      <div className="max-w-screen-xl flex items-center justify-between mx-auto p-1 md:p-20">
         <a href="/Login" className="flex items-center">
-          <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white mt-0">
-            Cricket Tournament
-          </span>
+          <span className="ml-2 text-left text-2xl font-semibold whitespace-nowrap text-white mt-2.5">Cricket Tournament</span>
         </a>
 
         <button
@@ -64,16 +62,16 @@ function Navbar(props) {
         </button>
 
         <div
-          className={`w-full md:block md:w-auto ${isMenuOpen ? "" : "hidden"}`}
+          className={`w-full md:w-auto md:flex md:items-center ${isMenuOpen ? "" : "hidden"}`}
           id="navbar-default"
         >
-          <ul className="font-medium flex flex-col p-2 md:p-0 mt-0 md:flex-row md:space-x-4 md:mt-0  dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
+          <ul className="font-medium flex flex-col md:p-0  md:flex-row md:space-x-4 md:mt-0 dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
             {props.usertype === "admin" && (
               <>
                 <li>
                   <a
                     href="/View_Matches"
-                    className="block py-2 pl-3 pr-4 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
+                    className="block py-2 pl-3 pr-4 text-gray-100 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
                   >
                     View Matches
                   </a>
@@ -81,7 +79,7 @@ function Navbar(props) {
                 <li>
                   <a
                     href="/Add_Tournament"
-                    className="block py-2 pl-3 pr-4 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
+                    className="block py-2 pl-3 pr-4 text-gray-100 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
                   >
                     Add Tournament
                   </a>
@@ -89,18 +87,42 @@ function Navbar(props) {
                 <li>
                   <a
                     href="/Add_Match"
-                    className="block py-2 pl-3 pr-4 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
+                    className="block py-2 pl-3 pr-4 text-gray-100 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
                   >
                     Add Match
                   </a>
                 </li>
                 <li>
-                  <a
-                    href="/Logout"
-                    className="block py-2 pl-3 pr-4 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
-                  >
-                    Logout
-                  </a>
+                  <div className="relative ml-auto">
+                    {/* {username && ( */}
+                    <div
+                      className="flex items-center cursor-pointer"
+                      onClick={toggleProfileDropdown}
+                    >
+                      <img
+                        src="/path/to/your/profile-pic.jpg"
+                        alt=""
+                        className="w-8 h-8 mt-1 rounded-full border border-gray-300"
+                      />
+                    </div>
+                    {/* )} */}
+
+                    {showProfileDropdown && (
+                      <div className="absolute right-0 mt-2 bg-white border border-gray-200 dark:bg-gray-800 dark:border-gray-700 rounded-lg shadow-md">
+                        <ul className="py-2">
+
+                          <li>
+                            <a
+                              href="/Logout"
+                              className="block w-full text-left px-4 py-2 text-gray-800 hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+                            >
+                              Logout
+                            </a>
+                          </li>
+                        </ul>
+                      </div>
+                    )}
+                  </div>
                 </li>
               </>
             )}
@@ -109,7 +131,7 @@ function Navbar(props) {
                 <li>
                   <a
                     href="/Your_Matches"
-                    className="block py-2 pl-3 pr-4 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
+                    className="block py-2 pl-3 pr-4 text-gray-100 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
                   >
                     Your Matches
                   </a>
@@ -117,25 +139,25 @@ function Navbar(props) {
                 <li>
                   <a
                     href="/Add_Team"
-                    className="block py-2 pl-3 pr-4 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
+                    className="block py-2 pl-3 pr-4 text-gray-100 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
                   >
                     Add Team
                   </a>
                 </li>
                 <li>
                   <div className="relative ml-auto">
-                    {username && (
-                      <div
-                        className="flex items-center cursor-pointer"
-                        onClick={toggleProfileDropdown}
-                      >
-                        <img
-                          src="/path/to/your/profile-pic.jpg"
-                          alt=""
-                          className="w-8 h-8 mt-1 rounded-full border border-gray-300"
-                        />
-                      </div>
-                    )}
+                    {/* {username && ( */}
+                    <div
+                      className="flex items-center cursor-pointer"
+                      onClick={toggleProfileDropdown}
+                    >
+                      <img
+                        src="/path/to/your/profile-pic.jpg"
+                        alt=""
+                        className="w-8 h-8 mt-1 rounded-full border border-gray-300"
+                      />
+                    </div>
+                    {/* )} */}
 
                     {showProfileDropdown && (
                       <div className="absolute right-0 mt-2 bg-white border border-gray-200 dark:bg-gray-800 dark:border-gray-700 rounded-lg shadow-md">

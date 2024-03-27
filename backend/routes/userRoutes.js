@@ -6,11 +6,12 @@ const User = require('../models/user');
 
 const io = require('../app');
 const stripe = require("stripe")("sk_test_51OjLLdSDcDq2PzkiuB784Qt82nsky5v4q9NUZR2XlcufKGJMzezPSrkjl2UnYBA7v4ZXiFOLuxbTGEwKQOn0o8b500A2VtaGub");
-
+const pointTable = require('../models/pointTable');
 const Graph = require('../models/graph');
 
 const { isauthenticated } = require('../middleware/auth');
 const match = require('../models/match');
+
 const router = express.Router();
 // const Razorpay = require('razorpay');
 // const razorpay = new Razorpay({ key_id:})
@@ -60,6 +61,7 @@ router.post('/user_matches', isauthenticated, async (req, res) => {
     try {
         // const userId = req.session.userId;
         if (req.userId) {
+            console.log(req.userId)
             const matches = await match.find();
             var user_matches = [];
             for (var i = 0; i < matches.length; i++) {
@@ -135,19 +137,9 @@ router.post('/add_team', isauthenticated, async (req, res) => {
         tournament.capacity--;
         await tournament.save();
         await team.save();
-        // payment integration
-        // const amount = tournament.tournament_fee;
-        // const currency = 'INR';
-        // const user = await User.findById(tournament.userId);
-        // const option = {
-        //     amount,
-        //     currency,
-        //     notes: {
-        //         Tournamentorganizer: user.username.toString()
-        //     },
-        // };
-        // const order = await razorpay.orders.create(options);
 
+        const point = new pointTable({ team, tournament, played_match: 0, win: 0, loss: 0, netRunrate: 0, point: 0, tie: 0 });
+        await point.save();
         res.json({ message: 'team added successfully.', });
     }
     catch (error) {
@@ -212,4 +204,69 @@ router.post('/profile', isauthenticated, async (req, res) => {
         res.status(500).json({ error: 'An error occurred.' });
     }
 });
+
+router.get('/FectchTeams', isauthenticated, async (req, res) => {
+    try {
+        const teams = await Team.find({ userId: req.userId });
+        console.log(req.userId)
+        // Populate the players field for each team
+        const populatedTeams = await Team.populate(teams, { path: 'players' });
+
+        res.json(populatedTeams);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'An error occurred.' });
+    }
+});
+ismatchplayed = async (req, res, next) => {
+    console.log("hkjhj");
+    try {
+        console.log(req.body.teamId)
+        const teamId = req.body.teamId;
+
+        const matches = await match.find();
+        for (const match of matches) {
+            if (match.teamId[0] == teamId || match.teamId[1] == teamId) {
+                return res.status(400).send("Player can't be updated because the teamId matches.");
+            }
+        }
+        // console.log(matches);
+        if (matches)
+            next();
+        else
+            res.status(500).json({ error: 'Internal Server Error' });
+
+    }
+    catch (error) {
+
+        console.log(error.message)
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+}
+router.put('/players/:id', ismatchplayed, async (req, res) => {
+    const playerId = req.params.id;
+    const { name, type } = req.body;
+    try {
+        const player = await Player.findById(playerId);
+        if (!player) {
+            return res.status(404).json({ error: 'Player not found' });
+        }
+
+        if (name) {
+            player.name = name;
+        }
+        if (type) {
+            player.type = type;
+        }
+
+        await player.save();
+
+
+        res.json(player);
+    } catch (error) {
+        console.error('Error updating player:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
 module.exports = router;

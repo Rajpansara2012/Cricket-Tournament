@@ -1034,9 +1034,12 @@ function Scoring() {
         </div>
       )}
 
-      {isLoding ? (<div className="flex justify-center">
-        <TailSpin color="#00BFFF" height={50} width={50} />
-      </div>) : iswicket != 1 && isshow == 2 && (
+      {isLoding ? (<div className="flex justify-center items-center h-screen">
+        <div>
+          <TailSpin color="#00BFFF" height={50} width={50} />
+        </div>
+      </div>
+      ) : iswicket != 1 && isshow == 2 && (
         <>
           <div className="bg-gray-100 p-4 rounded-lg shadow-md">
             <div className="grid grid-cols-2 text-center mb-4 flex justify-between">

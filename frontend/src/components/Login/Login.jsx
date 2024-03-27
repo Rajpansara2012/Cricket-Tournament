@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import Cookies from 'js-cookie';
 
+
 function Login(props) {
     const [formData, setFormData] = useState({
         email: "",
@@ -17,12 +18,12 @@ function Login(props) {
         // async function fetchData() {
         //     try {
         //         const response = await axios.post('http://localhost:5000/predict', {
-        //             runs_left: 200,
-        //             balls_left: 100,
-        //             wickets_left: 4,
-        //             total_runs_x: 208,
-        //             cur_run_rate: 5.0,
-        //             req_run_rate: 1
+        //             runs_left: 19,
+        //             balls_left: 12,
+        //             wickets_left: 10,
+        //             total_runs_x: 200,
+        //             cur_run_rate: 10,
+        //             req_run_rate: 12
         //         });
         //         console.log(response.data);
 
@@ -114,14 +115,16 @@ function Login(props) {
                         Login
                     </button>
                     <p className="mt-4 text-center">
-                        haven't account?{" "}
+                        Don't have an account?{" "}
                         <Link to="/Signup" className="text-blue-500">
-                            Signup
+                            Sign up
                         </Link>
                     </p>
                 </form>
             </div>
         </div>
+
+
     );
 }
 

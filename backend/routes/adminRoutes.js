@@ -12,6 +12,7 @@ const { ObjectId } = require('mongodb');
 const match = require('../models/match');
 const router = express.Router();
 const io = require('../app');
+const PointTable = require('../models/pointTable');
 
 router.post('/addtournament', isauthenticated, async (req, res) => {
     try {
@@ -341,6 +342,72 @@ router.post('/save_player', async (req, res) => {
         const t2Id = m.teamId[1];
         const team1Obj = await (Team.findById(t1Id));
         const team2Obj = await (Team.findById(t2Id));
+        const pointTable1 = await (PointTable.findOne({ team: t1Id }));
+        const pointTable2 = await (PointTable.findOne({ team: t2Id }));
+
+
+
+        if (m.score[0] > m.score[1]) {
+            pointTable1.win += 1;
+            pointTable1.point += 2;
+            pointTable1.played_match += 1;
+            pointTable2.loss += 1;
+            pointTable2.played_match += 1;
+        }
+        else if (m.score[0] < m.score[1]) {
+            pointTable2.win += 1;
+            pointTable2.point += 2;
+            pointTable2.played_match += 1;
+            pointTable1.loss += 1;
+            pointTable1.played_match += 1;
+        }
+        else {
+            pointTable1.point += 1;
+            pointTable1.played_match += 1;
+            pointTable1.tie += 1;
+            pointTable2.point += 1;
+            pointTable2.played_match += 1;
+            pointTable2.tie += 1;
+        }
+        const allmatch = await Match.find();
+        var team1_score = 0, team1_over = 0, opp_over = 0, opp_score = 0;
+        for (var i = 0; i < allmatch.length; i++) {
+            if (allmatch[i].teamId[0] == t1Id) {
+                team1_over += allmatch[i].over[0];
+                team1_score += allmatch[i].score[0];
+                opp_over += allmatch[i].over[1];
+                opp_score += allmatch[i].score[1];
+            }
+            else if (allmatch[i].teamId[1] == t1Id) {
+                team1_over += allmatch[i].over[1];
+                team1_score += allmatch[i].score[1];
+                opp_over += allmatch[i].over[0];
+                opp_score += allmatch[i].score[0];
+            }
+        }
+        var nrr = (team1_score / team1_over) - (opp_score / opp_over);
+        pointTable1.netRunrate = nrr;
+        team1_score = 0, team1_over = 0, opp_over = 0, opp_score = 0;
+        for (var i = 0; i < allmatch.length; i++) {
+            if (allmatch[i].teamId[0] == t2Id) {
+                team1_over += allmatch[i].over[0];
+                team1_score += allmatch[i].score[0];
+                opp_over += allmatch[i].over[1];
+                opp_score += allmatch[i].score[1];
+            }
+            else if (allmatch[i].teamId[1] == t2Id) {
+                team1_over += allmatch[i].over[1];
+                team1_score += allmatch[i].score[1];
+                opp_over += allmatch[i].over[0];
+                opp_score += allmatch[i].score[0];
+            }
+        }
+        nrr = (team1_score / team1_over) - (opp_score / opp_over);
+        pointTable2.netRunrate = nrr;
+        console.log(pointTable1)
+        console.log(pointTable2)
+        await pointTable1.save();
+        await pointTable2.save();
         // for (var i = 0; i < 11; i++) {
         //     const p1 = await (Player.findById(team1Obj.players[i]));
         //     const p2 = await (Player.findById(team2Obj.players[i]));
@@ -348,25 +415,25 @@ router.post('/save_player', async (req, res) => {
         //     m.players2.push(p2);
         // }
         // m.save();
-        
+
         for (var i = 0; i < 11; i++) {
             const p1 = await (Player.findById(team1Obj.players[i]));
             const p2 = await (Player.findById(team2Obj.players[i]));
             const graph = new Graph({
-                run : p1.batting_run,
-                strike_rate : (p1.profile.faced_ball+p1.batting_ball) != 0 ? ((p1.profile.run + p1.batting_run)/ (p1.profile.faced_ball + p1.batting_ball)) * 100 : 0,
-                wicket : p1.wicket,
-                economy : (p1.profile.delivery_ball+p1.bowling_ball) !== 0 ? (p1.profile.bowling_run + p1.bowling_run) / ((p1.profile.delivery_ball + p1.bowling_ball) / 6):0,
-                status : p1.batting_status,
-                bowling_ball : p1.bowling_ball,
-                player : p1._id
+                run: p1.batting_run,
+                strike_rate: (p1.profile.faced_ball + p1.batting_ball) != 0 ? ((p1.profile.run + p1.batting_run) / (p1.profile.faced_ball + p1.batting_ball)) * 100 : 0,
+                wicket: p1.wicket,
+                economy: (p1.profile.delivery_ball + p1.bowling_ball) !== 0 ? (p1.profile.bowling_run + p1.bowling_run) / ((p1.profile.delivery_ball + p1.bowling_ball) / 6) : 0,
+                status: p1.batting_status,
+                bowling_ball: p1.bowling_ball,
+                player: p1._id
             });
             const graph1 = new Graph({
-                run : p2.batting_run,
-                strike_rate : p2.profile.faced_ball != 0 ? ((p2.profile.run + p2.batting_run)/ (p2.profile.faced_ball + p2.batting_ball)) * 100 : 0,
-                wicket : p2.wicket,
-                economy : p2.profile.delivery_ball !== 0 ? (p2.profile.bowling_run + p2.bowling_run) / ((p2.profile.delivery_ball + p2.bowling_ball) / 6):0,
-                player : p2._id
+                run: p2.batting_run,
+                strike_rate: p2.profile.faced_ball != 0 ? ((p2.profile.run + p2.batting_run) / (p2.profile.faced_ball + p2.batting_ball)) * 100 : 0,
+                wicket: p2.wicket,
+                economy: p2.profile.delivery_ball !== 0 ? (p2.profile.bowling_run + p2.bowling_run) / ((p2.profile.delivery_ball + p2.bowling_ball) / 6) : 0,
+                player: p2._id
             });
             graph.save();
             graph1.save();
@@ -416,7 +483,7 @@ router.post('/save_player', async (req, res) => {
             p2.economy = 0;
             p2.save();
         }
-        
+
         res
             .cookie("bastman1", null, {
                 expires: new Date()
@@ -449,5 +516,36 @@ router.post('/matches', async (req, res) => {
         res.status(500).json({ error: 'An error occurred.' });
     }
 });
+router.post('/point_table', async (req, res) => {
+    try {
+        const point_table = await PointTable.find({ tournament: req.body.tournament_id })
+            .populate('team', 'team_name')
+            .sort([
+                ['point', -1],
+                ['netRunrate', -1]
+            ])
+            .exec(); // Execute the primary sort
+
+        // Apply the secondary sort after primary sort
+        point_table.sort((a, b) => {
+            if (a.played_match === 0 && b.played_match !== 0) {
+                return 1;
+            } else if (a.played_match !== 0 && b.played_match === 0) {
+                return -1;
+            } else {
+                return 0;
+            }
+        });
+
+        res.json({ message: 'Point table fetched successfully.', point_table });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ error: 'An error occurred.' });
+    }
+});
+
+
+
+
 
 module.exports = router;

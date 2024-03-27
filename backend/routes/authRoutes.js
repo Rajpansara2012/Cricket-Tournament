@@ -62,6 +62,9 @@ router.post('/logout', (req, res) => {
         res.status(200).cookie("user_type", null, {
             expires: new Date(), httpOnly: true
         })
+        res.status(200).cookie("username", null, {
+            expires: new Date(), httpOnly: true
+        })
         res.json({
             success: true,
             message: "Logged Out"
