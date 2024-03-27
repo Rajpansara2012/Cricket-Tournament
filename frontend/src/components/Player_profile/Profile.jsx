@@ -32,6 +32,7 @@ import {
   Legend,
 } from "chart.js";
 
+
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -42,6 +43,7 @@ ChartJS.register(
   Legend
 );
 
+
 export default function ProfilePage() {
   const navigate = useNavigate();
   const [profile, setProfile] = useState(null);
@@ -51,6 +53,7 @@ export default function ProfilePage() {
   const [graph_wicket, setGraph_wicket] = useState(null);
   const [graph_economy, setGraph_economy] = useState(null);
 
+
   useEffect(() => {
     const userfind = Cookies.get("token");
     const usertype = Cookies.get("user_type");
@@ -59,6 +62,7 @@ export default function ProfilePage() {
     } else if (usertype !== "admin") {
       navigate("/Profile");
     }
+
 
     const fetchProfile = async () => {
       try {
@@ -84,6 +88,7 @@ export default function ProfilePage() {
     };
     fetchProfile();
   }, []);
+  console.log(user);
   const data_run = {
     labels: graph_run ? graph_run.map((_, index) => index + 1) : [],
     datasets: [
@@ -98,6 +103,7 @@ export default function ProfilePage() {
       },
     ],
   };
+
 
   const config_run = {
     type: "line",
@@ -139,6 +145,7 @@ export default function ProfilePage() {
     ],
   };
 
+
   const config_strike_rate = {
     type: "line",
     data: data_strike_rate,
@@ -176,6 +183,7 @@ export default function ProfilePage() {
       },
     ],
   };
+
 
   const config_wicket = {
     type: "line",
@@ -215,6 +223,7 @@ export default function ProfilePage() {
     ],
   };
 
+
   const config_economy = {
     type: "line",
     data: data_economy,
@@ -248,7 +257,7 @@ export default function ProfilePage() {
             <MDBCard className="mb-4">
               <MDBCardBody>
                 <MDBCardImage
-                  src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3.webp"
+                  src= {Cookies.get('profile_img')}
                   alt="avatar"
                   className="rounded-circle"
                   style={{ width: "140px", height: "143px", margin: "auto" }}
@@ -257,6 +266,7 @@ export default function ProfilePage() {
               </MDBCardBody>
             </MDBCard>
           </MDBCol>
+
 
           {/* Card with User Information */}
           <MDBCol lg="9">
@@ -270,6 +280,7 @@ export default function ProfilePage() {
                   <MDBCol sm="9">
                     <MDBCardText className="text-muted">
                       {profile && profile[0].name}
+                      {!profile && user && user.username}
                     </MDBCardText>
                   </MDBCol>
                 </MDBRow>
@@ -294,12 +305,15 @@ export default function ProfilePage() {
                   <MDBCol sm="9">
                     <MDBCardText className="text-muted">
                       {profile && profile[0].type}
+                      {!profile && "-"}
+
                     </MDBCardText>
                   </MDBCol>
                 </MDBRow>
               </MDBCardBody>
             </MDBCard>
           </MDBCol>
+
 
           <MDBCol lg="12">
             <MDBCard className="mb-4">
@@ -312,6 +326,7 @@ export default function ProfilePage() {
                   <MDBCol sm="9">
                     <MDBCardText className="text-muted">
                       {profile && profile[0].profile.run}
+                      {!profile && "-"}
                     </MDBCardText>
                   </MDBCol>
                 </MDBRow>
@@ -324,6 +339,8 @@ export default function ProfilePage() {
                   <MDBCol sm="9">
                     <MDBCardText className="text-muted">
                       {profile && profile[0].profile.strike_rate}
+                      {!profile && "-"}
+
                     </MDBCardText>
                   </MDBCol>
                 </MDBRow>
@@ -336,6 +353,8 @@ export default function ProfilePage() {
                   <MDBCol sm="9">
                     <MDBCardText className="text-muted">
                       {profile && profile[0].profile.wicket}
+                      {!profile && "-"}
+
                     </MDBCardText>
                   </MDBCol>
                 </MDBRow>
@@ -348,6 +367,8 @@ export default function ProfilePage() {
                   <MDBCol sm="9">
                     <MDBCardText className="text-muted">
                       {profile && profile[0].profile.economy.toFixed(2)}
+                      {!profile && "-"}
+
                     </MDBCardText>
                   </MDBCol>
                 </MDBRow>
@@ -355,6 +376,7 @@ export default function ProfilePage() {
             </MDBCard>
           </MDBCol>
         </MDBRow>
+
 
         <MDBRow style={{ marginBottom: '20px' }}>
           <MDBCol lg="6">
@@ -365,6 +387,7 @@ export default function ProfilePage() {
             </MDBCard>
           </MDBCol>
 
+
           <MDBCol lg="6">
             <MDBCard>
               <MDBCardBody>
@@ -374,6 +397,7 @@ export default function ProfilePage() {
           </MDBCol>
         </MDBRow>
 
+
         <MDBRow>
           <MDBCol lg="6">
             <MDBCard>
@@ -382,6 +406,7 @@ export default function ProfilePage() {
               </MDBCardBody>
             </MDBCard>
           </MDBCol>
+
 
           <MDBCol lg="6">
             <MDBCard>

@@ -1064,7 +1064,7 @@ function Scoring() {
                   : 0}({match.over[1]}/{match.total_over})
               </h2>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-5">
               <div className="bg-white p-4 rounded-lg shadow-md flex justify-between">
                 <div className="ml-5">
                   <h3 className="text-xl font-semibold">
