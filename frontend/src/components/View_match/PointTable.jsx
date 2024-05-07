@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 function PointTable({ tournament, onClose }) {
-    const tournament_id = tournament._id;
+    const tournament_id = tournament;
     const [pt, setPt] = useState(null);
     const [isLoading, setIsLoading] = useState(true); // Track loading state
 
@@ -65,7 +65,7 @@ function PointTable({ tournament, onClose }) {
                                 <td className="px-4 py-2 border border-gray-200">{teamData.win}</td>
                                 <td className="px-4 py-2 border border-gray-200">{teamData.loss}</td>
                                 <td className="px-4 py-2 border border-gray-200">{teamData.tie}</td>
-                                <td className="px-4 py-2 border border-gray-200">{teamData.netRunrate}</td>
+                                <td className="px-4 py-2 border border-gray-200">{(teamData.netRunrate).toFixed(2)}</td>
                                 <td className="px-4 py-2 border border-gray-200">{teamData.point}</td>
                             </tr>
                         ))}

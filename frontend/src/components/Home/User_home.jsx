@@ -7,11 +7,13 @@ import io from 'socket.io-client';
 import { TailSpin } from 'react-loader-spinner';
 import MatchDetails from '../View_match/MatchDetails';
 import Commentary from '../View_match/Commentary';
+import PointTable from '../View_match/PointTable';
 
 Modal.setAppElement('#root');
 
 function User_home() {
   const socket = io('http://localhost:8082', { withCredentials: true });
+  const [isPointTablePopupOpen, setIsPointTablePopupOpen] = useState(false);
 
   const [isPopupOpen, setPopupOpen] = useState(false);
   const [selectedMatch, setSelectedMatch] = useState(null);
@@ -20,7 +22,9 @@ function User_home() {
   const navigate = useNavigate();
   const [liveMatches, setLiveMatches] = useState([]);
   const [completedMatches, setCompletedMatches] = useState([]);
-
+  const [selectedTournament, setSelectedTournament] = useState(null);
+  // const predictions = [];
+  // const [pri, setpri] = useState([]);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -37,7 +41,29 @@ function User_home() {
         );
 
         const { liveMatches, completedMatches } = response.data;
+        // for (const match of liveMatches) {
+        //   if ((match.wicket[0] == 10 || match.over[0] == match.total_over)) {
+        //     async function fetchData() {
+        //       try {
+        //         const response = await axios.post('http://localhost:5000/predict', {
+        //           runs_left: 19,
+        //           balls_left: 12,
+        //           wickets_left: 10,
+        //           total_runs_x: 200,
+        //           cur_run_rate: 10,
+        //           req_run_rate: 12
+        //         });
+        //         predictions.push(response.data);
 
+        //       } catch (error) {
+        //         console.error('Error:', error);
+        //       }
+        //     }
+        //     fetchData();
+        //   }
+        // }
+
+        // setpri(predictions);
         // Update state with fetched matches
         setLiveMatches(liveMatches);
         setCompletedMatches(completedMatches);
@@ -92,7 +118,23 @@ function User_home() {
     setPopupOpen(true);
   };
 
+  const showPointTable = (tournament) => {
+    // Show point table popup
+    setSelectedTournament(tournament);
+    setIsPointTablePopupOpen(true);
+  };
 
+  const closePointTablePopup = () => {
+    // Close point table popup
+    setSelectedTournament(null);
+
+    setIsPointTablePopupOpen(false);
+  };
+  var i = 0;
+  const winProbability = {
+    teamA: 60,
+    teamB: 40
+  };
 
   return (
     <>
@@ -125,8 +167,8 @@ function User_home() {
                           .slice(0, 2)
                           .map((filteredPlayer, playerIndex) => (
                             <div key={playerIndex}>
-                              <p>
-                                {filteredPlayer.name} {filteredPlayer.batting_run}/{filteredPlayer.batting_ball}
+                              <p className='ml-4'>
+                                {filteredPlayer.name} {filteredPlayer.batting_run}({filteredPlayer.batting_ball})
                               </p>
                             </div>
                           ))}
@@ -145,13 +187,40 @@ function User_home() {
                           .slice(0, 2)
                           .map((filteredPlayer, playerIndex) => (
                             <div key={playerIndex}>
-                              <p>
-                                {filteredPlayer.name} {filteredPlayer.batting_run}/{filteredPlayer.batting_ball}
+                              <p className='ml-4'>
+                                {filteredPlayer.name} {filteredPlayer.batting_run}({filteredPlayer.batting_ball})
                               </p>
                             </div>
                           ))}
                       </div>
                     )}
+                    {(match.wicket[0] == 10 || match.over[0] == match.total_over) && match.winner == '' && <p className='ml-4 text-red-600'>{match.score[0] - match.score[1] + 1} runs needed from {(parseInt)(match.total_over * 6 - match.over[1] * 6)}</p>}
+                    {match.winner != '' && <> <button
+                      type="button"
+                      onClick={() => showPointTable(match.tournamentId, "pointTable")}
+                      className="inline-flex items-center text-sm font-medium px-2 py-1 rounded-full bg-green-100 dark:bg-green-700 text-green-700 dark:text-white hover:bg-green-200 dark:hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 disabled:bg-gray-400 disabled:hover:bg-gray-400 disabled:cursor-not-allowed"
+                    >
+                      Point Table
+                    </button>
+                      <button
+                        type="button"
+                        onClick={() => handleCardClick(match)}
+                        className="inline-flex ml-2 items-center text-sm font-medium px-2 py-1 rounded-full bg-blue-100 dark:bg-blue-700 text-blue-700 dark:text-white hover:bg-blue-200 dark:hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 disabled:bg-gray-400 disabled:hover:bg-gray-400 disabled:cursor-not-allowed"
+                      >
+                        Details
+                      </button></>}
+                    {/* {(match.wicket[0] == 10 || match.over[0] == match.total_over) && match.winner == '' &&
+                      <div className="flex items-center">
+
+                        {console.log(i)}
+                        <p className="font-semibold mr-4">Team A: {pri[i]}%</p>
+                        <div className="bg-blue-200 h-6 w-1/2 rounded-full">
+                          <div className="bg-green-500 h-full rounded-full" style={{ width: `${pri[i]}%` }}></div>
+                        </div>
+                        <p className="ml-4 font-semibold">Team B: {100 - pri[i++]}%</p>
+                        {console.log(i)}
+                      </div>
+                    } */}
                   </div>
                 </div>
                 <div
@@ -159,6 +228,7 @@ function User_home() {
                     }`}
                 >
                   {match.islive ? 'Live' : 'Completed'}
+
                 </div>
               </div>
             ))}
@@ -168,7 +238,6 @@ function User_home() {
               <div
                 key={index}
                 className="relative w-full md:w-1/2 lg:w-1/3 p-3"
-                onClick={() => handleCardClick(match)}
               >
                 <div className="bg-white rounded-lg shadow-lg p-4">
                   <h2 className="text-lg font-semibold mb-2">
@@ -185,7 +254,24 @@ function User_home() {
                       {match.team_name[1]} Score: {match.score[1]}/{match.wicket[1]}({match.over[1]})
                     </p>
                   </div>
+                  <button
+                    type="button"
+                    onClick={() => showPointTable(match.tournamentId, "pointTable")}
+                    className="inline-flex items-center text-sm font-medium px-2 py-1 rounded-full bg-green-100 dark:bg-green-700 text-green-700 dark:text-white hover:bg-green-200 dark:hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 disabled:bg-gray-400 disabled:hover:bg-gray-400 disabled:cursor-not-allowed"
+                  >
+                    Point Table
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleCardClick(match)}
+                    className="inline-flex ml-2 items-center text-sm font-medium px-2 py-1 rounded-full bg-blue-100 dark:bg-blue-700 text-blue-700 dark:text-white hover:bg-blue-200 dark:hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 disabled:bg-gray-400 disabled:hover:bg-gray-400 disabled:cursor-not-allowed"
+                  >
+                    Details
+                  </button>
+
+
                 </div>
+
                 <div
                   className={`absolute top-5 right-4 px-2 py-1 rounded font-semibold bg-green-500 text-white `}
                 >
@@ -240,6 +326,16 @@ function User_home() {
                 ) : (
                   <Commentary match={selectedMatch} />
                 )}
+              </div>
+            </div>
+          )}
+          {isPointTablePopupOpen && (
+            <div className="fixed inset-0 flex items-center justify-center z-50">
+              <div className="fixed inset-0 bg-black opacity-50 z-40"></div>
+              <div className="z-50 relative">
+                <div className="bg-white p-4 rounded-lg shadow-lg max-h-screen overflow-y-auto">
+                  <PointTable tournament={selectedTournament} onClose={closePointTablePopup} />
+                </div>
               </div>
             </div>
           )}

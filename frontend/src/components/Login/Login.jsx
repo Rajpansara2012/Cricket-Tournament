@@ -11,27 +11,27 @@ function Login(props) {
     });
 
     const [error, setError] = useState(""); // State for error message
-
+    const [isLoading, setIsLoading] = useState(false)
     useEffect(() => {
         const userfind = Cookies.get('token');
         const usertype = Cookies.get('user_type');
-        // async function fetchData() {
-        //     try {
-        //         const response = await axios.post('http://localhost:5000/predict', {
-        //             runs_left: 19,
-        //             balls_left: 12,
-        //             wickets_left: 10,
-        //             total_runs_x: 200,
-        //             cur_run_rate: 10,
-        //             req_run_rate: 12
-        //         });
-        //         console.log(response.data);
+        async function fetchData() {
+            try {
+                const response = await axios.post('http://localhost:5000/predict', {
+                    runs_left: 19,
+                    balls_left: 12,
+                    wickets_left: 10,
+                    total_runs_x: 200,
+                    cur_run_rate: 10,
+                    req_run_rate: 12
+                });
+                console.log(response.data);
 
-        //     } catch (error) {
-        //         console.error('Error:', error);
-        //     }
-        // }
-        // fetchData();
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+        fetchData();
         if (userfind !== undefined && usertype == 'admin') {
             navigate("/Admin_home");
         }
@@ -53,6 +53,7 @@ function Login(props) {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
+        setIsLoading(true);
         try {
             const response = await axios.post(
                 "http://localhost:8082/auth/login",
@@ -78,6 +79,9 @@ function Login(props) {
             setError("Invalid email or password");
             console.log(error);
         }
+        finally {
+            setIsLoading(false); // Set loading state to false after request completes
+        }
     }
 
     return (
@@ -96,6 +100,7 @@ function Login(props) {
                             onChange={handleChange}
                             className="w-full p-2 border rounded focus:ring focus:ring-blue-300"
                             placeholder="Email"
+                            disabled={isLoading}
                         />
                     </div>
                     <div className="mb-4">
@@ -106,13 +111,25 @@ function Login(props) {
                             onChange={handleChange}
                             className="w-full p-2 border rounded focus:ring focus:ring-blue-300"
                             placeholder="Password"
+                            disabled={isLoading}
                         />
                     </div>
                     <button
                         type="submit"
-                        className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600"
+                        className={`w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 ${isLoading ? 'opacity-50 cursor-not-allowed' : ''
+                            }`}
+                        disabled={isLoading} // Disable submit button while loading
                     >
-                        Login
+                        {isLoading ? (
+                            <div className="flex items-center justify-center">
+                                <div className="inline-block animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-white"></div>
+                            </div>
+                        ) : (
+                            <>Login</>
+                        )}
+
+
+
                     </button>
                     <p className="mt-4 text-center">
                         Don't have an account?{" "}

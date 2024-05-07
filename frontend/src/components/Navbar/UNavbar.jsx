@@ -26,11 +26,19 @@ import {
     PowerIcon,
     RocketLaunchIcon,
     Bars2Icon,
+    HomeIcon,
+    PlusCircleIcon,
+    ListBulletIcon,
 } from "@heroicons/react/24/solid";
+
 
 // profile menu component
 const profileMenuItems = [
-
+    {
+        label: "My Profile",
+        icon: UserCircleIcon,
+        link: "/Profile"
+    },
     {
         label: "Sign Out",
         icon: PowerIcon,
@@ -57,7 +65,7 @@ function ProfileMenu() {
                         alt="tania andrew"
                         className="border border-gray-900 p-0.5"
                         src={Cookies.get('profile_img')}
-                        style={{ width: "32px", height: "32px" }}
+                        style={{ width: "40px", height: "40px" }}
                     />
                     <ChevronDownIcon
                         strokeWidth={2.5}
@@ -177,26 +185,34 @@ const navListItems = [
     {
         label: "Home",
         link: "/Login",
+        icon: HomeIcon,
     },
     {
         label: "Matches",
-        link: "/View_Matches",
+        link: "/Your_Matches",
+        icon: ListBulletIcon,
+
     },
     {
-        label: "Add Tournament",
-        link: "/Add_Tournament",
+        label: "Add Team",
+        link: "/Add_Team",
+        icon: PlusCircleIcon,
+
     },
     {
-        label: "Add Match",
-        link: "/Add_match",
+        label: "Update Team",
+        link: "/Update-Team",
+        icon: ListBulletIcon,
+
     },
+
 ];
 
 function NavList() {
     return (
         <ul className="mt-3 mb-2 flex flex-col gap-2 lg:mb-0 lg:mt-0 lg:flex-row lg:items-center">
 
-            {navListItems.map(({ label, link }, key) => (
+            {navListItems.map(({ label, link, icon }, key) => (
                 <Typography
                     key={label}
                     as="a"
@@ -206,7 +222,10 @@ function NavList() {
                     className="font-medium text-blue-gray-500"
                 >
                     <MenuItem className="flex items-center gap-2 lg:rounded-full">
-
+                        {React.createElement(icon, {
+                            className: `h-4 w-4`,
+                            strokeWidth: 2,
+                        })}
                         <span className="text-gray-900"> {label}</span>
                     </MenuItem>
                 </Typography>
@@ -215,7 +234,7 @@ function NavList() {
     );
 }
 
-function Navbar() {
+function UNavbar(props) {
     const [isNavOpen, setIsNavOpen] = React.useState(false);
 
     const toggleIsNavOpen = () => setIsNavOpen((cur) => !cur);
@@ -229,7 +248,7 @@ function Navbar() {
 
     return (
 
-        <div className="mb-3 bg-white lg:pl-6">
+        <div className="  bg-white lg:pl-6">
             <div className="relative mx-auto flex items-center justify-between text-blue-gray-900">
                 <Typography
                     as="a"
@@ -240,7 +259,21 @@ function Navbar() {
                     Cricket Tournament
                 </Typography>
 
+                <div className="mx-auto hidden lg:block">
+                    <NavList />
+                </div>
+                <IconButton
+                    size="sm"
+                    color="blue-gray"
+                    variant="text"
+                    onClick={toggleIsNavOpen}
+                    className="ml-auto mr-3 mb-2 lg:hidden"
+                >
+                    <Bars2Icon className="h-4 w-4" />
+                </IconButton>
 
+
+                <ProfileMenu />
             </div>
             <MobileNav open={isNavOpen} className="mb-1 overflow-scroll">
                 <NavList />
@@ -248,4 +281,4 @@ function Navbar() {
         </div>
     );
 }
-export default Navbar;
+export default UNavbar;

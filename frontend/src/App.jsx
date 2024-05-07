@@ -11,7 +11,7 @@ import { useNavigate, Link } from "react-router-dom";
 
 import Add_Tournament from "./components/Home/Add_Tournament";
 import Add_match from "./components/Match_handling/Add_match";
-import Navbar from "./components/Navbar/Navbar";
+import ANavbar from "./components/Navbar/ANavbar";
 import Logout from "./components/Logout/Logout";
 import Scoring from "./components/Match_handling/Scoring";
 import TournamentList from "./components/View_match/TournamentList";
@@ -20,6 +20,8 @@ import Your_matches from "./components/Add_Team/Your_matches";
 import Profile from "./components/Player_profile/Profile";
 import Footer from "./components/footer/Footer";
 import UpdateTeam from "./components/Update-Team/Update-Team";
+import UNavbar from "./components/Navbar/UNavbar";
+import Navbar from "./components/Navbar/Navbar";
 
 
 
@@ -61,7 +63,11 @@ function App() {
   return (
     <div className="bg-gray-100">
       <div className="flex flex-col min-h-screen ">
-        <Navbar usertype={usertype} username={Cookies.get('username')}> </Navbar>
+
+        {usertype === 'admin' && <ANavbar usertype={usertype} username={Cookies.get('username')}> </ANavbar>}
+        {usertype === 'user' && <UNavbar usertype={usertype} username={Cookies.get('username')}> </UNavbar>}
+        {usertype === '' && <Navbar></Navbar>}
+
         <Router> {/* Wrap App component with Router */}
           <Routes>
             <Route path="/" element={<Navigate to="/Login" replace />} />

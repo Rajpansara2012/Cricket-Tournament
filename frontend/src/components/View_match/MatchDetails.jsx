@@ -1,6 +1,67 @@
-import React from 'react';
+import React, { useState } from 'react';
+import {
+    MDBCol,
+    MDBContainer,
+    MDBRow,
+    MDBCard,
+    MDBCardText,
+    MDBCardBody,
+    MDBCardImage,
+    MDBBtn,
+    MDBBreadcrumb,
+    MDBBreadcrumbItem,
+    MDBProgress,
+    MDBProgressBar,
+    MDBIcon,
+    MDBListGroup,
+    MDBListGroupItem,
+} from "mdb-react-ui-kit";
+import "mdb-react-ui-kit/dist/css/mdb.min.css";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import Cookies from "js-cookie";
+import { Line } from "react-chartjs-2";
+import {
+    Chart as ChartJS,
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    Title,
+    Tooltip,
+    Legend,
+} from "chart.js";
+import Playerprofile from './PlayerProfile';
+
+ChartJS.register(
+    CategoryScale,
+    LinearScale,
+    PointElement,
+    LineElement,
+    Title,
+    Tooltip,
+    Legend
+);
 
 function MatchDetails({ match }) {
+    const navigate = useNavigate();
+    const [profile, setProfile] = useState(null);
+    const [user, setUser] = useState(null);
+    const [graph_run, setGraph_run] = useState(null);
+    const [graph_strike_rate, setGraph_strike_rate] = useState(null);
+    const [graph_wicket, setGraph_wicket] = useState(null);
+    const [graph_economy, setGraph_economy] = useState(null);
+
+    const [selectedPlayer, setSelectedPlayer] = useState(null);
+
+    const handlePlayerClick = (playerId) => {
+        console.log(playerId)
+        setSelectedPlayer(playerId);
+    };
+
+    const handleClosePopup = () => {
+        setSelectedPlayer(null);
+    };
 
     return (
         <div className="p-4 bg-white shadow rounded">
@@ -50,7 +111,12 @@ function MatchDetails({ match }) {
                         <tbody>
                             {match[playerGroup].map((player, index) => (
                                 <tr key={index} className="border border-gray-400">
-                                    <td className="border border-gray-400 py-2 px-4">{player.name}</td>
+                                    <td className="border border-gray-400 py-2 px-4">
+                                        <a href="#" onClick={() => handlePlayerClick(player._id)}>
+                                            {player.name}
+                                        </a>
+                                    </td>
+
                                     <td className="border border-gray-400 py-2 px-4">{player.batting_run}</td>
                                     <td className="border border-gray-400 py-2 px-4">{player.batting_ball}</td>
                                     <td className="border border-gray-400 py-2 px-4">{Math.round(player.strike_rate)}</td>
@@ -64,6 +130,22 @@ function MatchDetails({ match }) {
                     </table>
                 ))}
             </div>
+            {selectedPlayer && (
+                <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center">
+                    <div className="bg-white p-8 rounded shadow-lg overflow-y-auto max-h-full">
+                        <h1 className='text-center text-xl'>Player Details</h1>
+                        <button
+                            onClick={handleClosePopup}
+                            className="mr-60 top-4 right-4 bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded"
+                        >
+                            Back
+                        </button>
+                        {/* Content of the popup */}
+                        <Playerprofile playerId={selectedPlayer}></Playerprofile>
+                    </div>
+                </div>
+            )}
+
         </div>
 
     );

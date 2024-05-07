@@ -71,7 +71,7 @@ def index():
 @app.route('/predict', methods=['POST'])
 def predict():
     data = request.json
-    # print([data])
+    print([data])
     sample_df = pd.DataFrame([data])  # Wrap data in a list to create DataFrame
     best_estimator = grid_search.best_estimator_
 

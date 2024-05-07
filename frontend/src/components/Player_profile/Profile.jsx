@@ -257,7 +257,7 @@ export default function ProfilePage() {
             <MDBCard className="mb-4">
               <MDBCardBody>
                 <MDBCardImage
-                  src= {Cookies.get('profile_img')}
+                  src={Cookies.get('profile_img')}
                   alt="avatar"
                   className="rounded-circle"
                   style={{ width: "140px", height: "143px", margin: "auto" }}
@@ -338,7 +338,7 @@ export default function ProfilePage() {
                   </MDBCol>
                   <MDBCol sm="9">
                     <MDBCardText className="text-muted">
-                      {profile && profile[0].profile.strike_rate}
+                      {profile && (profile[0].profile.strike_rate).toFixed(2)}
                       {!profile && "-"}
 
                     </MDBCardText>

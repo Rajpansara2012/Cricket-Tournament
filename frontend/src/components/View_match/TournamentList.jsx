@@ -112,7 +112,7 @@ function TournamentList() {
                                         </button>
                                         <button
                                             type="button"
-                                            onClick={() => showPointTable(tournament, "pointTable")}
+                                            onClick={() => showPointTable(tournament._id, "pointTable")}
                                             className="inline-flex items-center text-sm font-medium px-2 py-1 rounded-full bg-green-100 dark:bg-green-700 text-green-700 dark:text-white hover:bg-green-200 dark:hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 disabled:bg-gray-400 disabled:hover:bg-gray-400 disabled:cursor-not-allowed"
                                         >
                                             Point Table

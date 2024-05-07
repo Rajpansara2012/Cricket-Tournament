@@ -1062,6 +1062,7 @@ function Scoring() {
                 {match && match.wicket && match.wicket[1] != null
                   ? match.wicket[1]
                   : 0}({match.over[1]}/{match.total_over})
+                {(match.wicket[0] == 10 || match.over[0] == match.total_over) && <p className="text-xl">({match.score[0] - match.score[1] + 1} runs needed from {match.total_over * 6 - parseInt(Cookies.get("ball"))})</p>}
               </h2>
             </div>
             <div className="grid grid-cols-2 gap-5">

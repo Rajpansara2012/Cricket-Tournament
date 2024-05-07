@@ -14,6 +14,7 @@ function Add_Team() {
     const [selectedTournament, setSelectedTournament] = useState();
     const [isShow, setIsShow] = useState(false);
     const [IsTeamAdded, setIsteamAdded] = useState(false);
+    const [existingPlayers, setExistingPlayers] = useState([]);
     const [formData, setFormData] = useState({
         tournament_name: "",
         team_name: "",
@@ -83,7 +84,10 @@ function Add_Team() {
 
         setFormData({ tournament_name: "", team_name: "", players: Array(11).fill({ player_name: "", player_type: "" }) });
         setIsShow(false);
-        setIsteamAdded(true);
+        if (IsTeamAdded == false)
+            setIsteamAdded(true);
+        else
+            setIsteamAdded(false);
         setLoading(false);
         closeModal(); // Close the modal after submitting the form
     };
@@ -112,6 +116,25 @@ function Add_Team() {
             }
         };
         fetchTournaments();
+        const fetchplayer = async () => {
+            try {
+                setIsteamAdded(false);
+                const response = await axios.get(
+                    "http://localhost:8082/user/FectchPlayers",
+                    {},
+                    {
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        withCredentials: true,
+                    }
+                );
+                setExistingPlayers(response.data)
+            } catch (error) {
+                console.log(error);
+            }
+        };
+        fetchplayer();
     }, [IsTeamAdded]);
 
     const addTeamHandler = async (tournament) => {
@@ -132,7 +155,7 @@ function Add_Team() {
         setIsModalOpen(false);
     };
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 ">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-2 ml-2 mr-2 mb-2">
             {tournaments
                 .filter(tournament => tournament.capacity !== 0)
                 .map((tournament) => (

@@ -178,7 +178,7 @@ router.post('/profile', isauthenticated, async (req, res) => {
         // const profile = await (Player.findById(user._id));
         const profile = await (Player.find({ name: user.username }));
         console.log(profile)
-        if(profile.length != 0) {
+        if (profile.length != 0) {
             const obj_graph = await (Graph.find({ player: profile[0]._id }))
             console.log(obj_graph)
             const run = [];
@@ -194,7 +194,7 @@ router.post('/profile', isauthenticated, async (req, res) => {
                     wicket.push(obj_graph[i].wicket);
                     economy.push(obj_graph[i].economy);
                 }
-                
+
             }
             // console.log(user)
             res.json({ user: user, profile: profile, graph_run: run, graph_strike_rate: strike_rate, graph_wicket: wicket, graph_economy: economy });
@@ -210,10 +210,44 @@ router.post('/profile', isauthenticated, async (req, res) => {
     }
 });
 
+router.post('/Playerprofile', isauthenticated, async (req, res) => {
+    try {
+        // const profile = await (Player.findById(user._id));
+        console.log(req.body.playerId)
+        const profile = await Player.findById(req.body.playerId);
+        console.log(profile)
+
+        const obj_graph = await (Graph.find({ player: profile._id }))
+        // console.log(obj_graph)
+        const run = [];
+        const strike_rate = [];
+        const wicket = [];
+        const economy = [];
+        for (var i = 0; i < obj_graph.length; i++) {
+            if (obj_graph[i].status != 'remaing') {
+                run.push(obj_graph[i].run);
+                strike_rate.push(obj_graph[i].strike_rate);
+            }
+            if (obj_graph[i].bowling_ball != 0) {
+                wicket.push(obj_graph[i].wicket);
+                economy.push(obj_graph[i].economy);
+            }
+
+        }
+        // console.log(user)
+        res.json({ user: null, profile: profile, graph_run: run, graph_strike_rate: strike_rate, graph_wicket: wicket, graph_economy: economy });
+
+    }
+    catch (error) {
+        console.log(error);
+        res.status(500).json({ error: 'An error occurred.' });
+    }
+});
+
 router.get('/FectchTeams', isauthenticated, async (req, res) => {
     try {
         const teams = await Team.find({ userId: req.userId });
-        console.log(req.userId)
+
         // Populate the players field for each team
         const populatedTeams = await Team.populate(teams, { path: 'players' });
 
@@ -223,8 +257,21 @@ router.get('/FectchTeams', isauthenticated, async (req, res) => {
         res.status(500).json({ error: 'An error occurred.' });
     }
 });
+
+router.get('/FectchPlayers', isauthenticated, async (req, res) => {
+    try {
+        const players = await Player.find();
+        // Populate the players field for each team
+
+        res.json(players);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'An error occurred.' });
+    }
+});
+
 ismatchplayed = async (req, res, next) => {
-    console.log("hkjhj");
+    // console.log("hkjhj");
     try {
         console.log(req.body.teamId)
         const teamId = req.body.teamId;
