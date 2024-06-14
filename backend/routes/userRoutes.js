@@ -116,7 +116,7 @@ router.post('/handel_payment', isauthenticated, async (req, res) => {
 
 router.post('/add_team', isauthenticated, async (req, res) => {
     try {
-        // console.log("add team");
+        // console.log(req.body);
         const tournament_name = req.body.tournament_name;
         const tournament = await Tournament.findOne({ tournament_name });
         const team_name = req.body.team_name;
@@ -124,9 +124,15 @@ router.post('/add_team', isauthenticated, async (req, res) => {
         const players_obj = req.body.players;
         const players = [];
         for (var i = 0; i < players_obj.length; i++) {
-            const player = new Player({ name: players_obj[i].player_name, type: players_obj[i].player_type });
-            await player.save();
-            players.push(player);
+            if (!players_obj[i].hasOwnProperty('_id')) {
+                const player = new Player({ name: players_obj[i].name, type: players_obj[i].type });
+                await player.save();
+                players.push(player);
+            }
+            else {
+                console.log(players_obj[i])
+                players.push(players_obj[i]);
+            }
         }
 
 
